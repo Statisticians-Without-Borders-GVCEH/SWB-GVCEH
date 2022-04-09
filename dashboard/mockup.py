@@ -88,10 +88,10 @@ with aggregations:
 			prior_start_date, prior_end_date = gvceh.get_prior_period(start_date, end_date)
 			st.write('Prior period is from', prior_start_date, 'to', prior_end_date)
 			fig_1 = px.bar(sentiments_by_category, x='Sentiment', y=['Current', 'Prior'],
-				barmode='group')
+				barmode='group', color_discrete_sequence=['#000080', '#8c9e5e']*3)
 			st.plotly_chart(fig_1)
 		else:
-			fig_2 = px.bar(sentiments_by_category, x='Sentiment', y='Current')
+			fig_2 = px.bar(sentiments_by_category, x='Sentiment', y='Current', color_discrete_sequence=['#000080']*3)
 			st.plotly_chart(fig_2)
 
 		# 4. Top Influencers
@@ -99,7 +99,7 @@ with aggregations:
 		tweets_by_user = pd.DataFrame(current_df['name'].value_counts(sort=True).reset_index())
 		tweets_by_user.columns = ['name', 'number_of_tweets']
 		st.table(tweets_by_user.iloc[0:5])
-		fig_3 = px.bar(tweets_by_user.iloc[0:5], x='name', y='number_of_tweets')
+		fig_3 = px.bar(tweets_by_user.iloc[0:5], x='name', y='number_of_tweets', color_discrete_sequence=['#000080'])
 		st.plotly_chart(fig_3)
 
 		# 5. Geolocations
