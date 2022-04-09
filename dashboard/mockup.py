@@ -30,15 +30,15 @@ with sidebar:
 
 	start_date = scol1.date_input(
 	            "Start Date",
-	            date(2020, 2, 16),
-	            min_value=datetime.strptime("2015-02-16", "%Y-%m-%d"),
+	            date(2015, 2, 21),
+	            # min_value=datetime.strptime("2015-02-16", "%Y-%m-%d"),
 	            max_value=datetime.now(),
 	        )
 
 	end_date = scol2.date_input(
 	            "End Date",
-	            date(2020, 2, 24),
-	            min_value=datetime.strptime("2015-02-24", "%Y-%m-%d"),
+	            date(2015, 2, 24),
+	            # min_value=datetime.strptime("2015-02-24", "%Y-%m-%d"),
 	            max_value=datetime.now(),
 	        )
 
@@ -50,6 +50,7 @@ with sidebar:
 use_df = dsource_dict[option]
 current_df, prior_df = gvceh.get_frames(start_date, end_date, use_df)
 sentiments_by_category = gvceh.agg_sentiments_by_category(current_df, prior_df)
+
 
 
 with header:
@@ -64,19 +65,47 @@ with aggregations:
 	    st.sidebar.error('Error: End date must be on or after the start date.')
 	else:
 		st.header(option)
-		st.write(current_df.head())
 
+		# 1. Viewing a random sample of tweets for sentiment categories
+		st.subheader('Sample of Tweets' if option == 'Twitter' else 'Sample of Posts')
+		choice = st.selectbox('Choose a sentiment', 
+			['negative', 'neutral', 'positive'])
+		st.table((current_df.loc[current_df.airline_sentiment == choice].sample(n=5))[['tweet_id', 'text']])
+
+		# 2. Demo of the metrics feature
 		st.subheader('Metrics Feature')
 		mcol1, mcol2, mcol3 = st.columns(3)
 		mcol1.metric('Positive', 42, 2)
 		mcol2.metric('Neutral', 2, 3)
 		mcol3.metric('Negative', 4, 5)
 
+		# 3. Sentiment Scores Aggregated by Category, with prior period comparison
 		st.subheader('Sentiment Scores')
-		fig = px.bar(sentiments_by_category, x='Sentiment', y='Current')
-		st.plotly_chart(fig)
 
+		if priorperiod_flag:
+			prior_start_date, prior_end_date = gvceh.get_prior_period(start_date, end_date)
+			st.write('Prior period is from', prior_start_date, 'to', prior_end_date)
+			fig_1 = px.bar(sentiments_by_category, x='Sentiment', y=['Current', 'Prior'],
+				barmode='group')
+			st.plotly_chart(fig_1)
+		else:
+			fig_2 = px.bar(sentiments_by_category, x='Sentiment', y='Current')
+			st.plotly_chart(fig_2)
+
+		# 4. Top Influencers
 		st.subheader('Top Influencers')
-		tweets_by_user = pd.DataFrame(current_df['name'].value_counts(sort=True))
-		st.write(tweets_by_user.iloc[0:5])
-		st.bar_chart(tweets_by_user.iloc[0:5])
+		tweets_by_user = pd.DataFrame(current_df['name'].value_counts(sort=True).reset_index())
+		tweets_by_user.columns = ['name', 'number_of_tweets']
+		st.table(tweets_by_user.iloc[0:5])
+		fig_3 = px.bar(tweets_by_user.iloc[0:5], x='name', y='number_of_tweets')
+		st.plotly_chart(fig_3)
+
+
+
+
+
+
+
+
+
+

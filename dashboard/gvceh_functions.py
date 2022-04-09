@@ -21,14 +21,21 @@ def tooltips():
 
 	return readme
 
+def get_prior_period(start, end):
+	''' Get the start and end dates for the prior period.'''
+
+	timeperiod = end - start
+
+	prev_end = start - timedelta(days=1)
+	prev_start = prev_end - timeperiod
+
+	return prev_start, prev_end
+
 def get_frames(start, end, df):
 	''' Get a two subsets of a dataframe based on start and end dates, 
 	a current and prior period dataframe.'''
-
-	timeperiod = start - end
-
-	prev_start = start - timedelta(days=1)
-	prev_end = prev_start - timeperiod
+	
+	prev_start, prev_end = get_prior_period(start, end)
 	
 	current =  df.loc[(df.tweet_created >= datetime.combine(start, time())) & 
 	(df.tweet_created <= datetime.combine(end, time()))]
