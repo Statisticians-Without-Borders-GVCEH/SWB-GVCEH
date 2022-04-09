@@ -4,6 +4,8 @@ import pandas as pd
 from datetime import date, datetime, timedelta, time
 import gvceh_functions as gvceh
 import plotly.express as px
+import pydeck as pdk
+import numpy as np
 
 # init streamlit containers
 header = st.container()
@@ -99,6 +101,43 @@ with aggregations:
 		st.table(tweets_by_user.iloc[0:5])
 		fig_3 = px.bar(tweets_by_user.iloc[0:5], x='name', y='number_of_tweets')
 		st.plotly_chart(fig_3)
+
+		# 5. Geolocations
+		st.subheader('Geolocations')
+
+		df = pd.DataFrame(
+			np.random.randn(500, 2) / [40, 40] + [48.4538865, -123.3784181],
+			columns=['lat', 'lon'])
+
+		st.pydeck_chart(pdk.Deck(
+			map_style='mapbox://styles/mapbox/light-v9',
+			initial_view_state=pdk.ViewState(
+				latitude=48.45,
+				longitude=-123.37,
+				zoom=11,
+				pitch=50,
+			),
+			layers=[
+				pdk.Layer(
+					'HexagonLayer',
+					data=df,
+					get_position='[lon, lat]',
+					radius=200,
+					elevation_scale=4,
+					elevation_range=[0, 1000],
+					pickable=True,
+					extruded=True,
+				),
+				pdk.Layer(
+					'ScatterplotLayer',
+					data=df,
+					get_position='[lon, lat]',
+					get_color='[200, 30, 0, 160]',
+					get_radius=200,
+				),
+			],
+		))
+
 
 
 
