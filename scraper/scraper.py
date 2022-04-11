@@ -102,12 +102,12 @@ def search_by_neighbourhood_keyword_products():
     keywords = ['Homeless', 'Homelessness', 'Encampment', 'Poverty', 'Crime', 'Shelter', 'Tent', 'Overdose']
 
     ### create products
-    products = itertools.product(neighbourhoods, keywords)
+    #products = itertools.product(neighbourhoods, keywords)
 
     data = []
 
     ### run each product
-    for keys in list(products):
+    for keys in list(itertools.product(neighbourhoods, keywords)):
         ### generate the search string with spaces
         search_string = " ".join(keys)
 
