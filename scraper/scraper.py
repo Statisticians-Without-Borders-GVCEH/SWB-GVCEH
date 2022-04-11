@@ -52,7 +52,6 @@ def run_search(keywords):
     ### not yielding anything? exit early
     if not tweets.data: return []
 
-
     for tweet, user in zip(tweets.data, tweets.includes['users']):
         ### trying to figure out how to get coordinates
         #print(tweet.get('place', {}))
@@ -60,8 +59,6 @@ def run_search(keywords):
         #print(user.get('location', {}))
 
         newtweet = {}
-
-        #print("="*40)
 
         #original text
         newtweet['text'] = tweet.text
@@ -98,6 +95,7 @@ def run_search(keywords):
     return return_data
 
 def search_by_neighbourhood_keyword_products():
+
     ### dummy neighbourhoods
     neighbourhoods = ['Victoria', 'Greater Victoria', 'YYJ', 'GVCEH', 'Topaz Park', 'Beacon Hill Park', 'Pandora', 'Oaklands', 'Fairfield']
     ### dummy keywords
@@ -107,6 +105,7 @@ def search_by_neighbourhood_keyword_products():
     products = itertools.product(neighbourhoods, keywords)
 
     data = []
+
     ### run each product
     for keys in list(products):
         ### generate the search string with spaces
@@ -116,7 +115,6 @@ def search_by_neighbourhood_keyword_products():
         data += run_search(search_string)
 
     ### create pandas df of all data
-    #print(data)
     df = pd.DataFrame(data)
 
     ### remove duplicates
@@ -127,12 +125,7 @@ def search_by_neighbourhood_keyword_products():
 
     print(df.head(10))
     print(df.shape)
-    #pprint(data)
 
-
-    ## Count duplicates
-    dups_color = df.pivot_table(columns=['tweet_id'], aggfunc='size')
-    print (dups_color)
 
 def main():
     search_by_neighbourhood_keyword_products()
