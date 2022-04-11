@@ -18,6 +18,10 @@ ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
 ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
 
 
+### setting up the config
+MAX_TWEETS = 50
+
+
 client = tw.Client(bearer_token=BEARER_TOKEN)
 
 #url = "curl -X GET -H "Authorization: Bearer <BEARER TOKEN>" "https://api.twitter.com/2/tweets/20""
@@ -25,16 +29,19 @@ client = tw.Client(bearer_token=BEARER_TOKEN)
 # https://datascienceparichay.com/article/python-get-data-from-twitter-api-v2/
 # tweepy / api v2 info
 
-def run_search(keywords):
+def run_search(neighbourhoods, keywords):
 
     """
         Runs a twitter search based on these keywords
         Returns list of dict of all data found
     """
 
+    ### generate the search string with spaces
+    search_string = " ".join((neighbourhoods, keywords))
+
     return_data = []
 
-    search_query = f"{keywords} lang:en -is:retweet"
+    search_query = f"{search_string} lang:en -is:retweet"
 
     ### time limits
     # TODO: With elevated account
@@ -49,7 +56,7 @@ def run_search(keywords):
         #end_time=end_time,
         tweet_fields = ["context_annotations", "public_metrics", "created_at", "text", "source", "geo"],
         user_fields = ["name", "username", "location", "verified", "description", "public_metrics"],
-        max_results = 25,
+        max_results = MAX_TWEETS,
         expansions='author_id'
     )
 
@@ -92,7 +99,10 @@ def run_search(keywords):
         newtweet['num_followers'] = user.public_metrics['followers_count']
 
         ### so we know how it was found
-        newtweet['keywords'] = keywords
+        newtweet['search_keywords'] = search_string
+
+        ### more meta data
+        newtweet['search_neighbourhood'] = neighbourhoods
 
         return_data.append(newtweet)
 
@@ -111,12 +121,10 @@ def search_by_neighbourhood_keyword_products():
     data = []
 
     ### run each product
-    for keys in list(itertools.product(neighbourhoods, keywords)):
-        ### generate the search string with spaces
-        search_string = " ".join(keys)
-
+    for n,k in list(itertools.product(neighbourhoods, keywords)):
+        
         # run the search
-        data += run_search(search_string)
+        data += run_search(neighbourhoods=n, keywords=k)
 
     ### create pandas df of all data
     df = pd.DataFrame(data)
