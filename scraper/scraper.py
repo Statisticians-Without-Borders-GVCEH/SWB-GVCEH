@@ -1,17 +1,21 @@
 import datetime
 import itertools
+import os
 
 import tweepy as tw
 import pandas as pd 
 
 from pprint import pprint
- 
-API_KEY = "" # consumer
-API_SECRET_KEY = "" # consumer
-BEARER_TOKEN = ""
+from dotenv import load_dotenv
 
-ACCESS_TOKEN = ""
-ACCESS_TOKEN_SECRET = ""
+load_dotenv() # imprt out enviroment variables
+ 
+API_KEY = os.environ.get("API_KEY") # consumer
+API_SECRET_KEY = os.environ.get("API_SECRET_KEY") # consumer
+BEARER_TOKEN = os.environ.get("BEARER_TOKEN")
+
+ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
+ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
 
 
 client = tw.Client(bearer_token=BEARER_TOKEN)
@@ -120,7 +124,7 @@ def search_by_neighbourhood_keyword_products():
     ### remove duplicates
 
     ### write to csv
-    filename = f"GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
+    filename = f"data/GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
     df.to_csv(filename, encoding='utf-8')
 
     print(df.head(10))
