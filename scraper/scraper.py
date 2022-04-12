@@ -1,6 +1,7 @@
 import datetime
 import itertools
 import os
+import requests 
 
 import tweepy as tw
 import pandas as pd 
@@ -19,7 +20,7 @@ ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
 
 
 ### setting up the config
-MAX_TWEETS = 50
+MAX_TWEETS = 100
 
 
 client = tw.Client(bearer_token=BEARER_TOKEN)
@@ -57,7 +58,7 @@ def run_search(neighbourhoods, keywords):
         tweet_fields = ["context_annotations", "public_metrics", "created_at", "text", "source", "geo"],
         user_fields = ["name", "username", "location", "verified", "description", "public_metrics"],
         max_results = MAX_TWEETS,
-        expansions='author_id'
+        expansions=['author_id', 'geo.place_id']
     )
 
     ### not yielding anything? exit early
@@ -92,6 +93,16 @@ def run_search(neighbourhoods, keywords):
         # number of RTs
         newtweet['retweet_count'] = tweet.public_metrics['retweet_count']
 
+        ### geo data (where available)
+        newtweet['geo'] = tweet.geo
+        newtweet['geo_full_name'] = None
+        newtweet['geo_id'] = None
+
+        if tweet.geo:
+            ### TODO: INDEX PROPERLY
+            newtweet['geo_full_name'] = tweets.includes['places'][0]['full_name']
+            newtweet['geo_id'] = tweets.includes['places'][0]['id']
+
         # poster
         newtweet['username'] = user.username
 
@@ -112,11 +123,9 @@ def search_by_neighbourhood_keyword_products():
 
     ### dummy neighbourhoods
     neighbourhoods = ['Victoria', 'Greater Victoria', 'YYJ', 'GVCEH', 'Topaz Park', 'Beacon Hill Park', 'Pandora', 'Oaklands', 'Fairfield']
+
     ### dummy keywords
     keywords = ['Homeless', 'Homelessness', 'Encampment', 'Poverty', 'Crime', 'Shelter', 'Tent', 'Overdose']
-
-    ### create products
-    #products = itertools.product(neighbourhoods, keywords)
 
     data = []
 
