@@ -74,7 +74,7 @@ def agg_sentiments_by_category(cdf, pdf):
 
 def get_lat_long(left_df):
 	# right_df = pd.read_csv('/Users/sheilaflood/PycharmProjects/SWB-GVCEH/data/demo/Geolocation_Mapping - Sheet1.csv')
-	right_df = pd.read_csv('.data/demo/Geolocation_Mapping - Sheet1.csv')
+	right_df = pd.read_csv('./data/demo/Geolocation_Mapping - Sheet1.csv')
 	return left_df.merge(right_df, on='Appendix A Location', how='left')
 
 # def agg_tweets_by_users(cdf, pdf):
