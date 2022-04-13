@@ -7,8 +7,8 @@ def get_data():
 	reddit_df = pd.read_csv('./data/demo/reddit_antiwork.csv',
 	parse_dates=['timestamp'], dtype={'created':object})
 
-	twitter_df = pd.read_csv('./data/demo/Tweets.csv',
-	parse_dates=['tweet_created'], dtype={'tweet_id':object})
+	twitter_df = pd.read_csv('./data/demo/GVCEH-2022-04-11-tweet-raw-sentiment.csv',
+	parse_dates=['created_at'], dtype={'tweet_id':object})
 
 	return {'Twitter': twitter_df, 'Reddit': reddit_df}
 
@@ -36,12 +36,21 @@ def get_frames(start, end, df):
 	a current and prior period dataframe.'''
 	
 	prev_start, prev_end = get_prior_period(start, end)
+
+	df['created_at'] = pd.to_datetime(df.created_at).dt.tz_localize(None)
+
+	current =  df.loc[(df.created_at >= datetime.combine(start, time())) & 
+	(df.created_at <= datetime.combine(end, time()))]
+
+	# current =  df.loc[(df.created_at >= pd.Timestamp(start)) & 
+	# (df.created_at <= pd.Timestamp(end))]
 	
-	current =  df.loc[(df.tweet_created >= datetime.combine(start, time())) & 
-	(df.tweet_created <= datetime.combine(end, time()))]
-	
-	prior = df.loc[(df.tweet_created >= datetime.combine(prev_start, time())) & 
-	(df.tweet_created <= datetime.combine(prev_end, time()))]
+	prior = df.loc[(df.created_at >= datetime.combine(prev_start, time())) & 
+	(df.created_at <= datetime.combine(prev_end, time()))]
+
+	# prior = df.loc[(df.created_at >= pd.Timestamp(prev_start)) & 
+	# (df.created_at <= pd.Timestamp(prev_end))]
+
 
 	return current, prior
 
@@ -50,14 +59,28 @@ def agg_sentiments_by_category(cdf, pdf):
 	''' Aggregating number of sentiments by category and 
 	generating a single dataframe with current and prior period aggregations.'''
 
-	cagg = pd.DataFrame(cdf['airline_sentiment'].value_counts())
+	cagg = pd.DataFrame(cdf['sentiment'].value_counts())
 
-	pagg = pd.DataFrame(pdf['airline_sentiment'].value_counts())
+	pagg = pd.DataFrame(pdf['sentiment'].value_counts())
 	pagg.columns = ['Prior']
 
 	by_category =  cagg.join(pagg).reset_index()
 	by_category.columns = ['Sentiment', 'Current', 'Prior']
 
 	return by_category
+
+
+# def agg_tweets_by_users(cdf, pdf):
+# 	''' Aggregating number of tweets by username.'''
+
+# 	cagg = pd.DataFrame(cdf['name'].value_counts(sort=True))
+	
+# 	pagg = pd.DataFrame(pdf['name'].value_counts(sort=True))
+# 	pagg.columns = ['Prior']
+
+# 	influencers = cagg.join(pagg).reset_index
+# 	influencers.columns['Number of Tweets', 'Current', '']
+
+
 
 

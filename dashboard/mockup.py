@@ -12,6 +12,18 @@ header = st.container()
 aggregations = st.container()
 sidebar = st.container()
 
+
+# CSS to inject contained in a string
+hide_table_row_index = """
+            <style>
+            tbody th {display:none}
+            .blank {display:none}
+            </style>
+            """
+
+# Inject CSS with Markdown
+st.markdown(hide_table_row_index, unsafe_allow_html=True)
+
 # import data
 dsource_dict = gvceh.get_data()
 
@@ -32,20 +44,20 @@ with sidebar:
 
 	start_date = scol1.date_input(
 	            "Start Date",
-	            date(2015, 2, 21),
+	            date(2022, 4, 8),
 	            # min_value=datetime.strptime("2015-02-16", "%Y-%m-%d"),
 	            max_value=datetime.now(),
 	        )
 
 	end_date = scol2.date_input(
 	            "End Date",
-	            date(2015, 2, 24),
+	            date(2022, 4, 11),
 	            # min_value=datetime.strptime("2015-02-24", "%Y-%m-%d"),
 	            max_value=datetime.now(),
 	        )
 
 	priorperiod_flag = st.sidebar.checkbox(
-	        "Prior period comparison", value=True, help=readme['langford']
+	        "Prior period comparison", value=False, help=readme['langford']
 	    )
 
 # define variables based on user options
@@ -71,8 +83,8 @@ with aggregations:
 		# 1. Viewing a random sample of tweets for sentiment categories
 		st.subheader('Sample of Tweets' if option == 'Twitter' else 'Sample of Posts')
 		choice = st.selectbox('Choose a sentiment', 
-			['negative', 'neutral', 'positive'])
-		st.table((current_df.loc[current_df.airline_sentiment == choice].sample(n=5))[['tweet_id', 'text']])
+			['Negative', 'Neutral', 'Positive'])
+		st.table((current_df.loc[current_df.sentiment == choice].sample(n=5))[['tweet_id', 'text']])
 
 		# 2. Demo of the metrics feature
 		st.subheader('Metrics Feature')
@@ -96,12 +108,14 @@ with aggregations:
 
 		# 4. Top Influencers
 		st.subheader('Top Influencers')
-		tweets_by_user = pd.DataFrame(current_df['name'].value_counts(sort=True).reset_index())
-		tweets_by_user.columns = ['name', 'number_of_tweets']
-		st.table(tweets_by_user.iloc[0:5])
-		fig_3 = px.bar(tweets_by_user.iloc[0:5], x='name', y='number_of_tweets', color_discrete_sequence=['#000080'])
+		
+		current_influencers = pd.DataFrame(current_df['username'].value_counts(sort=True).reset_index())
+		current_influencers.columns = ['Username', 'Number of Tweets']
+		st.table(current_influencers.iloc[0:5])
+		fig_3 = px.bar(current_influencers.iloc[0:5], x='Username', y='Number of Tweets', color_discrete_sequence=['#000080'])
 		st.plotly_chart(fig_3)
 
+	
 		# 5. Geolocations
 		st.subheader('Geolocations')
 
