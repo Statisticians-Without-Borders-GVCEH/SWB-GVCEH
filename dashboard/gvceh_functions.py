@@ -5,9 +5,11 @@ import pandas as pd
 def get_data():
 	''' Loading the twitter and reddit datasets and generating a dictionary of dataframes.'''
 	reddit_df = pd.read_csv('./data/demo/reddit_antiwork.csv',
+	# reddit_df = pd.read_csv('/Users/sheilaflood/PycharmProjects/SWB-GVCEH/data/demo/reddit_antiwork.csv',
 	parse_dates=['timestamp'], dtype={'created':object})
 
 	twitter_df = pd.read_csv('./data/demo/GVCEH-2022-04-11-tweet-raw-sentiment.csv',
+	# twitter_df = pd.read_csv('/Users/sheilaflood/PycharmProjects/SWB-GVCEH/data/demo/GVCEH-2022-04-11-tweet-raw-sentiment.csv',
 	parse_dates=['created_at'], dtype={'tweet_id':object})
 
 	return {'Twitter': twitter_df, 'Reddit': reddit_df}
@@ -69,6 +71,11 @@ def agg_sentiments_by_category(cdf, pdf):
 
 	return by_category
 
+
+def get_lat_long(left_df):
+	# right_df = pd.read_csv('/Users/sheilaflood/PycharmProjects/SWB-GVCEH/data/demo/Geolocation_Mapping - Sheet1.csv')
+	right_df = pd.read_csv('.data/demo/Geolocation_Mapping - Sheet1.csv')
+	return left_df.merge(right_df, on='Appendix A Location', how='left')
 
 # def agg_tweets_by_users(cdf, pdf):
 # 	''' Aggregating number of tweets by username.'''

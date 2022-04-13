@@ -119,38 +119,54 @@ with aggregations:
 		# 5. Geolocations
 		st.subheader('Geolocations')
 
-		df = pd.DataFrame(
-			np.random.randn(500, 2) / [40, 40] + [48.4538865, -123.3784181],
-			columns=['lat', 'lon'])
+		# Creating test data until we can use real data
+		test_data = pd.DataFrame(
+			{'Appendix A Location': ['Central Park', 'Royal Athletic Park', 'Topaz Park', 'Royal Athletic Park',
+									 'Topaz Park', 'Central Park', 'Central Park', 'Hollywood Park', 'Stadacona Park'],
+			 'Sentiment': ['negative', 'neutral', 'positive', 'negative', 'positive', 'negative', 'neutral',
+						   'negative', 'neutral']})
+		test_data2 = gvceh.get_lat_long(test_data)
 
 		st.pydeck_chart(pdk.Deck(
-			map_style='mapbox://styles/mapbox/light-v9',
-			initial_view_state=pdk.ViewState(
-				latitude=48.45,
-				longitude=-123.37,
-				zoom=11,
-				pitch=50,
-			),
-			layers=[
-				pdk.Layer(
-					'HexagonLayer',
-					data=df,
-					get_position='[lon, lat]',
-					radius=200,
-					elevation_scale=4,
-					elevation_range=[0, 1000],
-					pickable=True,
-					extruded=True,
-				),
-				pdk.Layer(
-					'ScatterplotLayer',
-					data=df,
-					get_position='[lon, lat]',
-					get_color='[200, 30, 0, 160]',
-					get_radius=200,
-				),
-			],
-		))
+            map_style='mapbox://styles/mapbox/light-v9',
+            initial_view_state=pdk.ViewState(
+                latitude=48.45,
+                longitude=-123.37,
+                zoom=11,
+                pitch=50,
+                tooltip=True,
+            ),
+            tooltip={
+                'html': "<b>Number of Tweets:</b> {elevationValue}",
+                'style': {
+                    'color': 'white'
+                }
+            },
+            layers=[
+                pdk.Layer(
+                    'HexagonLayer',
+                    data=test_data2,
+                    get_position='[Longitude, Latitude]',
+                    auto_highlight=True,
+                    elevation_scale=4,
+                    radius=200,
+                    pickable=True,
+                    elevation_range=[10, 100],
+                    get_fill_color=[69, 162, 128, 255],
+                    extruded=True,
+                    coverage=1,
+                ),
+                # pdk.Layer(
+                # 	'ScatterplotLayer',
+                # 	data=test_data2,
+                # 	get_position='[Longitude, Latitude]',
+                # 	get_color='[200, 30, 0, 160]',
+                # 	get_radius=200,
+                # 	get_fill_color= '[180, 0, 200, 140]', # Set an RGBA value for fill
+                # 	pickable = True
+                # ),
+            ],
+        ))
 
 
 
