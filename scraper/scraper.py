@@ -58,17 +58,27 @@ def run_search(neighbourhoods, keywords):
         tweet_fields = ["context_annotations", "public_metrics", "created_at", "text", "source", "geo"],
         user_fields = ["name", "username", "location", "verified", "description", "public_metrics"],
         max_results = MAX_TWEETS,
+        place_fields=['country', 'geo', 'name', 'place_type'],
         expansions=['author_id', 'geo.place_id']
     )
 
     ### not yielding anything? exit early
     if not tweets.data: return []
 
+    ### generate our place information
+    if 'places' in tweets.includes.keys():
+        place_info = {
+            place.id: {
+                'bbox': place.geo['bbox'], #geoJSON, min long, min lat, max long, max lat
+                'full_name': place.full_name,
+                # place.name
+                # place.place_type
+                # place.full_name
+                # place.country
+            } for place in tweets.includes['places']
+        } 
+
     for tweet, user in zip(tweets.data, tweets.includes['users']):
-        ### trying to figure out how to get coordinates
-        #print(tweet.get('place', {}))
-        #print(tweet.get('coordinates', {None, None}))
-        #print(user.get('location', {}))
 
         newtweet = {}
 
@@ -94,14 +104,21 @@ def run_search(neighbourhoods, keywords):
         newtweet['retweet_count'] = tweet.public_metrics['retweet_count']
 
         ### geo data (where available)
-        newtweet['geo'] = tweet.geo
         newtweet['geo_full_name'] = None
         newtweet['geo_id'] = None
+        newtweet['geo_bbox'] = None
 
+        if tweet.geo:          
+            newtweet['geo_id'] = tweet.geo['place_id']
+            newtweet['geo_full_name'] = place_info[tweet.geo['place_id']]['full_name']
+            newtweet['geo_bbox'] = place_info[tweet.geo['place_id']]['bbox']
+
+        ### cordinate data - where available
+        ### TODO: validate this work with data with coordinates
         if tweet.geo:
-            ### TODO: INDEX PROPERLY
-            newtweet['geo_full_name'] = tweets.includes['places'][0]['full_name']
-            newtweet['geo_id'] = tweets.includes['places'][0]['id']
+            newtweet['tweet_coordinate'] = tweet.geo.get('coordinates', '')
+        else:
+            newtweet['tweet_coordinate'] = ''
 
         # poster
         newtweet['username'] = user.username
