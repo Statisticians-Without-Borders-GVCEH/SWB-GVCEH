@@ -2,6 +2,7 @@ import datetime
 import itertools
 import os
 import requests 
+import random
 
 import tweepy as tw
 import pandas as pd 
@@ -21,6 +22,7 @@ ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
 
 ### setting up the config
 MAX_TWEETS = 100
+TESTING = False
 
 
 client = tw.Client(bearer_token=BEARER_TOKEN)
@@ -43,6 +45,10 @@ def run_search(neighbourhoods, keywords):
     return_data = []
 
     search_query = f"{search_string} lang:en -is:retweet"
+    search_query = search_query.replace('and', '"and"')
+
+    print("="*40)
+    print(f"Searching for... {search_query}")
 
     ### time limits
     # TODO: With elevated account
@@ -138,11 +144,30 @@ def run_search(neighbourhoods, keywords):
 
 def search_by_neighbourhood_keyword_products():
 
-    ### dummy neighbourhoods
-    neighbourhoods = ['Victoria', 'Greater Victoria', 'YYJ', 'GVCEH', 'Topaz Park', 'Beacon Hill Park', 'Pandora', 'Oaklands', 'Fairfield']
+    ### dummy neighbourhoods - Appendix A
+    #neighbourhoods = ['Victoria', 'Greater Victoria', 'YYJ', 'GVCEH', 'Topaz Park', 'Beacon Hill Park', 'Pandora', 'Oaklands', 'Fairfield']
 
-    ### dummy keywords
-    keywords = ['Homeless', 'Homelessness', 'Encampment', 'Poverty', 'Crime', 'Shelter', 'Tent', 'Overdose']
+    data = pd.read_csv('../data/appendices/aa.csv', index_col=0)
+
+    neighbourhoods = [n.strip() for n in data.Location.tolist()]
+
+    ### searchwords - Appendix C, D and E
+    #keywords = ['Homeless', 'Homelessness', 'Encampment', 'Poverty', 'Crime', 'Shelter', 'Tent', 'Overdose']
+    data = pd.read_csv('../data/appendices/ac.csv', index_col=0)
+    kw1 = [k.strip() for k in data.Organizations.tolist()]
+
+    data = pd.read_csv('../data/appendices/ad.csv', index_col=0)
+    kw2 = [k.strip() for k in data.sectors.tolist()]
+
+    data = pd.read_csv('../data/appendices/ae.csv', index_col=0)
+    kw3 = [k.strip() for k in data.word.tolist()]
+
+    keywords = kw1 + kw2 + kw3
+
+    #### this is for testing so we dont blow through our entire limit of tweets
+    if TESTING:
+        neighbourhoods = random.sample(neighbourhoods, 10)
+        keywords = random.sample(keywords, 10)
 
     data = []
 
