@@ -196,5 +196,39 @@ def main():
     #search_by_influencer_keyword_products()
     #search_by_geolocation()
 
+def gen_queries():
+    # query 1
+    # query 2
+    # query 3
+    # query 4
+
+    # no single query more than 512 characters
+    # figure out the combining and and or in twitter keywords
+
+    # cache
+    pass
+
+def batch_scrape():
+    ### manage the pickle json data
+
+    ### probably manage the data file
+
+    ### figure out what attempt at scraping this is?
+
+    ### pull those n queries
+
+    ### pass to scraper
+
+    ### scrape
+
+    ### update scrape info
+    pass
+
 if __name__ == "__main__":
     main()
+
+    ### gen_queries
+    gen_queries()
+
+    ### batch scrape
+    batch_scrape()
