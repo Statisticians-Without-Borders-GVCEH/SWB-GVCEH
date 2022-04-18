@@ -24,6 +24,7 @@ ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
 ### setting up the config
 MAX_TWEETS = 100
 TESTING = False
+QUERY_MAX_LENGTH = 512
 
 
 client = tw.Client(bearer_token=BEARER_TOKEN)
@@ -250,6 +251,9 @@ def gen_query_one(KEYWORDS_DICT):
     for n in neighbourhoods:
         for kws in subq:
             querytext = f"{n} ({kws}) lang:en -is:retweet"
+            if len(querytext) > QUERY_MAX_LENGTH: 
+                print("WARNING: QUERY 1 TOO LARGE")
+                print("CHUNK KEYWORD UNION SMALLER")
             #max = len(querytext) if len(querytext) > max else max
             query1.append(querytext)
 
@@ -269,6 +273,7 @@ def gen_queries():
     # load keywords
     keywords = load_keywords()
 
+    ### generate query keyword paramteres
     ### prep keyword union
 
     # query 1 - neighbourhood keyword products 
