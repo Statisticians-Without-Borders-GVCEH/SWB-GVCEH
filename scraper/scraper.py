@@ -291,6 +291,10 @@ def gen_queries():
         pickle.dump(q1, f)
 
 def batch_scrape():
+
+    ### open our pickle cache
+    # https://stackoverflow.com/questions/25464295/dump-a-list-in-a-pickle-file-and-retrieve-it-back-later
+
     ### manage the pickle json data
 
     ### probably manage the data file
