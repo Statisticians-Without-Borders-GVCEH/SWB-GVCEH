@@ -269,6 +269,8 @@ def gen_queries():
     # load keywords
     keywords = load_keywords()
 
+    ### prep keyword union
+
     # query 1 - neighbourhood keyword products 
     print("Generating Query 1...")
     q1 = gen_query_one(keywords)
