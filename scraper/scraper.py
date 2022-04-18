@@ -3,6 +3,7 @@ import itertools
 import os
 import requests 
 import random
+import pickle
 
 import tweepy as tw
 import pandas as pd 
@@ -196,17 +197,82 @@ def main():
     #search_by_influencer_keyword_products()
     #search_by_geolocation()
 
+def load_keywords():
+    """
+        Loads our appendices into a dict of lists:
+        returns: {
+            'ac': [],
+            'ad': [],
+            'ae': []
+        }
+    """
+    data = pd.read_csv('../data/appendices/ac.csv', index_col=0)
+    kw1 = [k.strip().lower() for k in data.Organizations.tolist()]
+
+    data = pd.read_csv('../data/appendices/ad.csv', index_col=0)
+    kw2 = [k.strip().lower() for k in data.sectors.tolist()]
+
+    data = pd.read_csv('../data/appendices/ae.csv', index_col=0)
+    kw3 = [k.strip().lower() for k in data.word.tolist()]
+
+    return {
+        'ac': kw1,
+        'ad': kw2,
+        'ae': kw3
+    }
+
+def gen_query_one(KEYWORDS_DICT):
+
+    ### get our neighbourhoods
+    data = pd.read_csv('../data/appendices/aa.csv', index_col=0)
+
+    neighbourhoods = [n.strip().lower() for n in data.Location.tolist()]
+
+    ### make one list of keywords
+    allkw = sum(KEYWORDS_DICT.values(), [])
+
+    ### chunk it down, we can't exceed 512 character a query
+    allkw = [allkw[i::5] for i in range(5)]
+
+    subq = []
+
+    for a in allkw: 
+        subq.append(" OR ".join(a))
+
+    ### now to make our queries with the neighbourhoods
+    query1 = []
+    max = 0
+
+    for n in neighbourhoods:
+        for kws in subq:
+            querytext = f"{n} ({kws}) lang:en -is:retweet"
+            #max = len(querytext) if len(querytext) > max else max
+            query1.append(querytext)
+
+    #print(max)
+
+    ### returing a list of queries from this product
+    return query1
+
 def gen_queries():
-    # query 1
-    # query 2
-    # query 3
+    # load keywords
+    keywords = load_keywords()
+
+    # query 1 - neighbourhood keyword products 
+    print("Generating Query 1...")
+    q1 = gen_query_one(keywords)
+
+    # query 2 - CRD keyword products
+    # query 3 - account keyword products
     # query 4
 
     # no single query more than 512 characters
     # figure out the combining and and or in twitter keywords
 
-    # cache
-    pass
+    # cache queries
+    print("Writing...")
+    with open('querylist.pkl', 'wb') as f:
+        pickle.dump(q1, f)
 
 def batch_scrape():
     ### manage the pickle json data
@@ -225,7 +291,7 @@ def batch_scrape():
     pass
 
 if __name__ == "__main__":
-    main()
+    #main()
 
     ### gen_queries
     gen_queries()
