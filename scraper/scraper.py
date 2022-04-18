@@ -222,6 +222,9 @@ def load_keywords():
     }
 
 def gen_query_one(KEYWORDS_DICT):
+    """
+        Generates a list of queries containing neighbourhood x keyword products
+    """
 
     ### get our neighbourhoods
     data = pd.read_csv('../data/appendices/aa.csv', index_col=0)
@@ -237,6 +240,7 @@ def gen_query_one(KEYWORDS_DICT):
     subq = []
 
     for a in allkw: 
+        ### we use OR to help reduce number of queries
         subq.append(" OR ".join(a))
 
     ### now to make our queries with the neighbourhoods
@@ -254,6 +258,13 @@ def gen_query_one(KEYWORDS_DICT):
     ### returing a list of queries from this product
     return query1
 
+def gen_query_two(KEYWORD_DICT):
+    """
+        Generate list of CRD identifies x keywords 
+    """
+
+    pass
+
 def gen_queries():
     # load keywords
     keywords = load_keywords()
@@ -263,6 +274,9 @@ def gen_queries():
     q1 = gen_query_one(keywords)
 
     # query 2 - CRD keyword products
+    print("Generating Query 2...")
+    q2 = gen_query_two(keywords)
+
     # query 3 - account keyword products
     # query 4
 
