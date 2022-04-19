@@ -24,7 +24,11 @@ ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
 ### setting up the config
 MAX_TWEETS = 100
 TESTING = False
+
 QUERY_MAX_LENGTH = 512
+MAX_PER_15 = 25
+SUB_QUERY_CHUNKS = 6
+QUERY_CACHE_FILE = "querylist.pkl"
 
 
 client = tw.Client(bearer_token=BEARER_TOKEN)
@@ -222,7 +226,26 @@ def load_keywords():
         'ae': kw3
     }
 
-def gen_query_one(KEYWORDS_DICT):
+def prep_subq(KEYWORDS_DICT):
+    """
+        Generates the list of strings
+        Each string is the keyword subquery
+    """
+    ### make one list of keywords
+    allkw = sum(KEYWORDS_DICT.values(), [])
+
+    ### chunk it down, we can't exceed 512 character a query
+    allkw = [allkw[i::SUB_QUERY_CHUNKS] for i in range(SUB_QUERY_CHUNKS)]
+
+    subq = []
+
+    for a in allkw: 
+        ### we use OR to help reduce number of queries
+        subq.append(" OR ".join(a))
+
+    return subq
+
+def gen_query_one(SUB_QUERY):
     """
         Generates a list of queries containing neighbourhood x keyword products
     """
@@ -232,24 +255,11 @@ def gen_query_one(KEYWORDS_DICT):
 
     neighbourhoods = [n.strip().lower() for n in data.Location.tolist()]
 
-    ### make one list of keywords
-    allkw = sum(KEYWORDS_DICT.values(), [])
-
-    ### chunk it down, we can't exceed 512 character a query
-    allkw = [allkw[i::5] for i in range(5)]
-
-    subq = []
-
-    for a in allkw: 
-        ### we use OR to help reduce number of queries
-        subq.append(" OR ".join(a))
-
     ### now to make our queries with the neighbourhoods
     query1 = []
-    max = 0
 
     for n in neighbourhoods:
-        for kws in subq:
+        for kws in SUB_QUERY:
             querytext = f"{n} ({kws}) lang:en -is:retweet"
             if len(querytext) > QUERY_MAX_LENGTH: 
                 print("WARNING: QUERY 1 TOO LARGE")
@@ -262,12 +272,72 @@ def gen_query_one(KEYWORDS_DICT):
     ### returing a list of queries from this product
     return query1
 
-def gen_query_two(KEYWORD_DICT):
+def gen_query_two(SUB_QUERY):
     """
         Generate list of CRD identifies x keywords 
     """
 
-    pass
+    ### our CRD level keywords
+    neighbourhoods = [
+        'Greater Victoria', '#GreaterVictoria', 'Victoria', 'VictoriaBC', 
+        'Victoria B.C.', '#YYJ', 'YYJ', '#GVCEH', 
+        'Greater Victoria Coalition to End Homelessness'
+    ]
+
+    ### now to make our queries with the neighbourhoods
+    query = []
+
+    for n in neighbourhoods:
+        for kws in SUB_QUERY:
+            querytext = f"{n} ({kws}) lang:en -is:retweet"
+            if len(querytext) > QUERY_MAX_LENGTH: 
+                print("WARNING: QUERY 2 TOO LARGE")
+                print("CHUNK KEYWORD UNION SMALLER")
+                print(querytext)
+                print(len(querytext))
+            query.append(querytext)
+
+    ### returing a list of queries from this product
+    return query
+    
+def chunker(seq, size):
+    return (seq[pos:pos + size] for pos in range(0, len(seq), size))
+
+def gen_query_three(SUB_QUERY):
+    """
+        Check specific twitter accounts for tweets
+    """
+
+    ### load the names from the appendix
+    data = pd.read_csv('../data/appendices/aborganizations.csv', index_col=0)
+
+    orgs = [n.strip().lower() for n in data.Organizations.tolist()]
+
+    data = pd.read_csv('../data/appendices/abpersons.csv', index_col=0)
+
+    pers = [n.strip().lower() for n in data.Influencers.tolist()]
+
+    ### loop through like above to generate queries
+    query = []
+
+    for grp in chunker(orgs+pers, 5):
+
+        subtext = []
+        for name in grp:
+            subtext.append(f"from:{name}")
+
+        subtext = " OR ".join(subtext)
+
+        for kws in SUB_QUERY:
+            querytext = f"({subtext}) ({kws}) lang:en -is:retweet"
+            if len(querytext) > QUERY_MAX_LENGTH: 
+                print("WARNING: QUERY 3 TOO LARGE")
+                print("CHUNK KEYWORD UNION SMALLER")
+                print(querytext)
+                print(len(querytext))
+            query.append(querytext)
+
+    return query
 
 def gen_queries():
     # load keywords
@@ -275,51 +345,70 @@ def gen_queries():
 
     ### generate query keyword paramteres
     ### prep keyword union
+    subq = prep_subq(keywords)
 
     # query 1 - neighbourhood keyword products 
     print("Generating Query 1...")
-    q1 = gen_query_one(keywords)
+    q1 = gen_query_one(subq)
 
     # query 2 - CRD keyword products
     print("Generating Query 2...")
-    q2 = gen_query_two(keywords)
+    q2 = gen_query_two(subq)
 
     # query 3 - account keyword products
-    # query 4
+    print("Generating Query 3")
+    q3 = gen_query_three(subq)
 
-    # no single query more than 512 characters
-    # figure out the combining and and or in twitter keywords
+    # query 4 - geotagged tweets
+    q4 = []
+
+    ### combine
+    queries = q1 + q2 + q3 + q4
+
+    print(f"Total # of queries: {len(queries)}")
+    print(f"Will take {len(queries) / MAX_PER_15} attempts")
 
     # cache queries
     print("Writing...")
-    with open('querylist.pkl', 'wb') as f:
-        pickle.dump(q1, f)
+    with open(QUERY_CACHE_FILE, 'wb') as f:
+        pickle.dump(queries, f)
 
 def batch_scrape():
 
-    ### open our pickle cache
+    ### open our pickle cache of queries
     # https://stackoverflow.com/questions/25464295/dump-a-list-in-a-pickle-file-and-retrieve-it-back-later
+    with open(QUERY_CACHE_FILE, 'rb') as f:
+        query_cache = pickle.load(f)
 
-    ### manage the pickle json data
+    ### manage the pickle json data for state status
+    ### first day today?  yes or no
+    ### yes -> going to have to create a new CSV
+    ### no -> take inrement
 
     ### probably manage the data file
 
     ### figure out what attempt at scraping this is?
+    job_n = 0
+    print(f"Batch job #{job_n} today.")
 
     ### pull those n queries
+    our_queries = query_cache[MAX_PER_15*job_n : MAX_PER_15 * (job_n+1)]
+
+    for q in our_queries:
+        print(q)
+        input()
 
     ### pass to scraper
 
     ### scrape
 
     ### update scrape info
-    pass
 
 if __name__ == "__main__":
     #main()
 
     ### gen_queries
-    gen_queries()
+    #gen_queries()
 
     ### batch scrape
     batch_scrape()
