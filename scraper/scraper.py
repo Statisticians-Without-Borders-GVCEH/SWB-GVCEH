@@ -1,9 +1,8 @@
 import datetime
-import itertools
 import os
-import requests 
-import random
 import pickle
+import os.path
+import time
 
 import tweepy as tw
 import pandas as pd 
@@ -26,7 +25,7 @@ MAX_TWEETS = 100
 TESTING = False
 
 QUERY_MAX_LENGTH = 512
-MAX_PER_15 = 25
+MAX_PER_15 = 100 ### TODO: Find this limit
 SUB_QUERY_CHUNKS = 6
 QUERY_CACHE_FILE = "querylist.pkl"
 
@@ -38,28 +37,16 @@ client = tw.Client(bearer_token=BEARER_TOKEN)
 # https://datascienceparichay.com/article/python-get-data-from-twitter-api-v2/
 # tweepy / api v2 info
 
-def run_search(neighbourhoods, keywords):
-
+def query_twitter(TW_QUERY):
+    """ 
+        Run one query against the API and store it
     """
-        Runs a twitter search based on these keywords
-        Returns list of dict of all data found
-    """
-
-    ### generate the search string with spaces
-    search_string = " ".join((neighbourhoods, keywords))
 
     return_data = []
-
-    search_query = f"{search_string} lang:en -is:retweet"
-    search_query = search_query.replace('and', '"and"')
+    search_query = TW_QUERY.replace(' and ', ' "and" ')
 
     print("="*40)
     print(f"Searching for... {search_query}")
-
-    ### time limits
-    # TODO: With elevated account
-    #start_time = "2021-07-01T00:00:00Z"
-    #end_time = "2022-01-01T00:00:00Z"
 
     # get tweets
     ### limits us last 7 days, need elevated account for longer than that
@@ -75,7 +62,9 @@ def run_search(neighbourhoods, keywords):
     )
 
     ### not yielding anything? exit early
-    if not tweets.data: return []
+    if not tweets.data: 
+        print("Sorry, no results found")
+        return []
 
     ### generate our place information
     if 'places' in tweets.includes.keys():
@@ -90,6 +79,7 @@ def run_search(neighbourhoods, keywords):
             } for place in tweets.includes['places']
         } 
 
+    ### generate our twitter data
     for tweet, user in zip(tweets.data, tweets.includes['users']):
 
         newtweet = {}
@@ -139,68 +129,34 @@ def run_search(neighbourhoods, keywords):
         newtweet['num_followers'] = user.public_metrics['followers_count']
 
         ### so we know how it was found
-        newtweet['search_keywords'] = search_string
+        newtweet['search_keywords'] = search_query
 
         ### more meta data
-        newtweet['search_neighbourhood'] = neighbourhoods
+        # TODO: need to add
+        newtweet['search_neighbourhood'] = "NEED TO ADD"
 
         return_data.append(newtweet)
 
     return return_data
 
-def search_by_neighbourhood_keyword_products():
-
-    ### dummy neighbourhoods - Appendix A
-    #neighbourhoods = ['Victoria', 'Greater Victoria', 'YYJ', 'GVCEH', 'Topaz Park', 'Beacon Hill Park', 'Pandora', 'Oaklands', 'Fairfield']
-
-    data = pd.read_csv('../data/appendices/aa.csv', index_col=0)
-
-    neighbourhoods = [n.strip() for n in data.Location.tolist()]
-
-    ### searchwords - Appendix C, D and E
-    #keywords = ['Homeless', 'Homelessness', 'Encampment', 'Poverty', 'Crime', 'Shelter', 'Tent', 'Overdose']
-    data = pd.read_csv('../data/appendices/ac.csv', index_col=0)
-    kw1 = [k.strip() for k in data.Organizations.tolist()]
-
-    data = pd.read_csv('../data/appendices/ad.csv', index_col=0)
-    kw2 = [k.strip() for k in data.sectors.tolist()]
-
-    data = pd.read_csv('../data/appendices/ae.csv', index_col=0)
-    kw3 = [k.strip() for k in data.word.tolist()]
-
-    keywords = kw1 + kw2 + kw3
-
-    #### this is for testing so we dont blow through our entire limit of tweets
-    if TESTING:
-        neighbourhoods = random.sample(neighbourhoods, 10)
-        keywords = random.sample(keywords, 10)
-
-    data = []
-
-    ### run each product
-    for n,k in list(itertools.product(neighbourhoods, keywords)):
-        
-        # run the search
-        data += run_search(neighbourhoods=n, keywords=k)
+def save_results(RESULTS):
+    #pprint(RESULTS)
 
     ### create pandas df of all data
-    df = pd.DataFrame(data)
+    df = pd.DataFrame(RESULTS)
 
     ### remove duplicates
 
     ### write to csv
     filename = f"data/GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
-    df.to_csv(filename, encoding='utf-8')
+
+    if os.path.isfile(filename):
+        df.to_csv(filename, encoding='utf-8', mode='a', header=False, index=False)
+    else:
+        df.to_csv(filename, encoding='utf-8', index=False)
 
     print(df.head(10))
     print(df.shape)
-
-
-def main():
-    search_by_neighbourhood_keyword_products()
-    #search_by_crd_keyword_products()
-    #search_by_influencer_keyword_products()
-    #search_by_geolocation()
 
 def load_keywords():
     """
@@ -395,18 +351,19 @@ def batch_scrape():
     our_queries = query_cache[MAX_PER_15*job_n : MAX_PER_15 * (job_n+1)]
 
     for q in our_queries:
-        print(q)
-        input()
 
-    ### pass to scraper
+        ### pass to scrape
+        ### scrape and save
+        data = query_twitter(q)
 
-    ### scrape
+        ### scave our data - only if we got any
+        if data: save_results(data)
+
+        time.sleep(1)
 
     ### update scrape info
 
 if __name__ == "__main__":
-    #main()
-
     ### gen_queries
     #gen_queries()
 
