@@ -77,16 +77,6 @@ def get_lat_long(left_df):
 	right_df = pd.read_csv('./data/demo/Geolocation_Mapping - Sheet1.csv')
 	return left_df.merge(right_df, on='Appendix A Location', how='left')
 
-# def agg_tweets_by_users(cdf, pdf):
-# 	''' Aggregating number of tweets by username.'''
-
-# 	cagg = pd.DataFrame(cdf['name'].value_counts(sort=True))
-	
-# 	pagg = pd.DataFrame(pdf['name'].value_counts(sort=True))
-# 	pagg.columns = ['Prior']
-
-# 	influencers = cagg.join(pagg).reset_index
-# 	influencers.columns['Number of Tweets', 'Current', '']
 
 
 
