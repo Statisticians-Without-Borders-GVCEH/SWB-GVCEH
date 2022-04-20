@@ -25,9 +25,14 @@ MAX_TWEETS = 100
 TESTING = False
 
 QUERY_MAX_LENGTH = 512
-MAX_PER_15 = 100 ### TODO: Find this limit
+MAX_PER_15 = 9999 ### TODO: Find this limit
 SUB_QUERY_CHUNKS = 6
 QUERY_CACHE_FILE = "querylist.pkl"
+
+
+#### TODO: count till fails
+## count queries sent
+## count tweets returned
 
 
 client = tw.Client(bearer_token=BEARER_TOKEN)
@@ -347,17 +352,34 @@ def batch_scrape():
     job_n = 0
     print(f"Batch job #{job_n} today.")
 
+    num_queries = 0
+    num_results = 0
+
     ### pull those n queries
     our_queries = query_cache[MAX_PER_15*job_n : MAX_PER_15 * (job_n+1)]
 
     for q in our_queries:
 
-        ### pass to scrape
-        ### scrape and save
-        data = query_twitter(q)
+        num_queries += 1
 
-        ### scave our data - only if we got any
-        if data: save_results(data)
+        try:
+
+            ### pass to scrape
+            ### scrape and save
+            data = query_twitter(q)
+
+            num_results += len(data)
+
+            ### scave our data - only if we got any
+            if data: save_results(data)
+
+        except Exception as e:
+
+            print("Broke on...")
+            print(f"Query # {num_queries}")
+            print(f"Returned {num_results} tweets")
+            print(str(e))
+            input()
 
         time.sleep(1)
 
