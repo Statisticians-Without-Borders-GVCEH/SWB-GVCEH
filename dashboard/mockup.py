@@ -60,6 +60,16 @@ with sidebar:
 	        "Prior period comparison", value=False, help=readme['langford']
 	    )
 
+	st.sidebar.header('3. Locations')
+
+	locations_selected = []
+	agg_levels = ['Capital Region District (All)', 'Neighborhood', 'Park']
+	agg_option = st.sidebar.selectbox('Select an aggregation level:', agg_levels)
+	location_option = gvceh.get_locations(agg_option)
+	if location_option:
+		locations_selected = st.sidebar.multiselect('Select specific location(s):', location_option,
+													default=location_option)
+
 # define variables based on user options
 use_df = dsource_dict[option]
 current_df, prior_df = gvceh.get_frames(start_date, end_date, use_df)
@@ -122,59 +132,68 @@ with aggregations:
 		fig_3 = px.bar(current_influencers.iloc[0:5], x='Username', y='Number of Tweets', color_discrete_sequence=['#000080'])
 		st.plotly_chart(fig_3)
 
-	
 		# 5. Geolocations
 		st.subheader('Geolocations')
 
 		# Creating test data until we can use real data
 		test_data = pd.DataFrame(
 			{'Appendix A Location': ['Central Park', 'Royal Athletic Park', 'Topaz Park', 'Royal Athletic Park',
-									 'Topaz Park', 'Central Park', 'Central Park', 'Hollywood Park', 'Stadacona Park'],
-			 'Sentiment': ['negative', 'neutral', 'positive', 'negative', 'positive', 'negative', 'neutral',
-						   'negative', 'neutral']})
-		test_data2 = gvceh.get_lat_long(test_data)
+									 'Topaz Park', 'Central Park', 'Central Park', 'Hollywood Park', 'Stadacona Park',
+									 'Downtown'],
+			 'Sentiment': ['Negative', 'Neutral', 'Positive', 'Negative', 'Positive', 'Negative', 'Neutral',
+						   'Negative', 'Neutral', 'Neutral']})
 
-		st.pydeck_chart(pdk.Deck(
-            map_style='mapbox://styles/mapbox/light-v9',
-            initial_view_state=pdk.ViewState(
-                latitude=48.45,
-                longitude=-123.37,
-                zoom=11,
-                pitch=50,
-                tooltip=True,
-            ),
-            tooltip={
-                'html': "<b>Number of Tweets:</b> {elevationValue}",
-                'style': {
-                    'color': 'white'
-                }
-            },
-            layers=[
-                pdk.Layer(
-                    'HexagonLayer',
-                    data=test_data2,
-                    get_position='[Longitude, Latitude]',
-                    auto_highlight=True,
-                    elevation_scale=4,
-                    radius=200,
-                    pickable=True,
-                    elevation_range=[10, 100],
-                    get_fill_color=[69, 162, 128, 255],
-                    extruded=True,
-                    coverage=1,
-                ),
-                # pdk.Layer(
-                # 	'ScatterplotLayer',
-                # 	data=test_data2,
-                # 	get_position='[Longitude, Latitude]',
-                # 	get_color='[200, 30, 0, 160]',
-                # 	get_radius=200,
-                # 	get_fill_color= '[180, 0, 200, 140]', # Set an RGBA value for fill
-                # 	pickable = True
-                # ),
-            ],
-        ))
 
+		if locations_selected:
+			k = test_data[test_data["Appendix A Location"].isin(locations_selected)]
+			st.write(k.pivot_table(index='Appendix A Location',
+								   columns='Sentiment',
+								   aggfunc=len,
+								   fill_value=0))
+		elif agg_option == 'Capital Region District (All)':
+			k = test_data
+			k_pivot = k.pivot_table(index='Appendix A Location',
+									columns='Sentiment',
+									aggfunc=len,
+									fill_value=0)
+			st.write(k_pivot)
+		else:
+
+			st.sidebar.error("No options selected. Please select at least one location.")
+
+		if (len(locations_selected) > 0 or agg_option == 'Capital Region District (All)'):
+			test_data2 = gvceh.get_lat_long(k)
+			st.pydeck_chart(pdk.Deck(
+				map_style='mapbox://styles/mapbox/light-v9',
+				initial_view_state=pdk.ViewState(
+					latitude=48.45,
+					longitude=-123.37,
+					zoom=11,
+					pitch=50,
+					tooltip=True,
+				),
+				tooltip={
+					'html': "<b>Number of Tweets:</b> {elevationValue}",
+					'style': {
+						'color': 'white'
+					}
+				},
+				layers=[
+					pdk.Layer(
+						'HexagonLayer',
+						data=test_data2,
+						get_position='[Longitude, Latitude]',
+						auto_highlight=True,
+						elevation_scale=4,
+						radius=200,
+						pickable=True,
+						elevation_range=[10, 100],
+						get_fill_color=[69, 162, 128, 255],
+						extruded=True,
+						coverage=1,
+					),
+				],
+			))
 
 
 
