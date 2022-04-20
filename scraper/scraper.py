@@ -30,11 +30,6 @@ SUB_QUERY_CHUNKS = 6
 QUERY_CACHE_FILE = "querylist.pkl"
 
 
-#### TODO: count till fails
-## count queries sent
-## count tweets returned
-
-
 client = tw.Client(bearer_token=BEARER_TOKEN)
 
 #url = "curl -X GET -H "Authorization: Bearer <BEARER TOKEN>" "https://api.twitter.com/2/tweets/20""
@@ -42,7 +37,7 @@ client = tw.Client(bearer_token=BEARER_TOKEN)
 # https://datascienceparichay.com/article/python-get-data-from-twitter-api-v2/
 # tweepy / api v2 info
 
-def query_twitter(TW_QUERY):
+def query_twitter(TW_QUERY, RELEVANT_REGION):
     """ 
         Run one query against the API and store it
     """
@@ -121,11 +116,10 @@ def query_twitter(TW_QUERY):
             newtweet['geo_bbox'] = place_info[tweet.geo['place_id']]['bbox']
 
         ### cordinate data - where available
-        ### TODO: validate this work with data with coordinates
+        newtweet['tweet_coordinate'] = ''
         if tweet.geo:
-            newtweet['tweet_coordinate'] = tweet.geo.get('coordinates', '')
-        else:
-            newtweet['tweet_coordinate'] = ''
+            if tweet.geo.get('coordinates', None):
+                newtweet['tweet_coordinate'] = tweet.geo.get('coordinates').get('coordinates')
 
         # poster
         newtweet['username'] = user.username
@@ -137,8 +131,7 @@ def query_twitter(TW_QUERY):
         newtweet['search_keywords'] = search_query
 
         ### more meta data
-        # TODO: need to add
-        newtweet['search_neighbourhood'] = "NEED TO ADD"
+        newtweet['search_neighbourhood'] = RELEVANT_REGION
 
         return_data.append(newtweet)
 
@@ -226,7 +219,7 @@ def gen_query_one(SUB_QUERY):
                 print("WARNING: QUERY 1 TOO LARGE")
                 print("CHUNK KEYWORD UNION SMALLER")
             #max = len(querytext) if len(querytext) > max else max
-            query1.append(querytext)
+            query1.append((querytext, n))
 
     #print(max)
 
@@ -256,7 +249,7 @@ def gen_query_two(SUB_QUERY):
                 print("CHUNK KEYWORD UNION SMALLER")
                 print(querytext)
                 print(len(querytext))
-            query.append(querytext)
+            query.append((querytext, n))
 
     ### returing a list of queries from this product
     return query
@@ -296,7 +289,7 @@ def gen_query_three(SUB_QUERY):
                 print("CHUNK KEYWORD UNION SMALLER")
                 print(querytext)
                 print(len(querytext))
-            query.append(querytext)
+            query.append((querytext, 'individual'))
 
     return query
 
@@ -366,7 +359,7 @@ def batch_scrape():
 
             ### pass to scrape
             ### scrape and save
-            data = query_twitter(q)
+            data = query_twitter(q[0], q[1])
 
             num_results += len(data)
 
@@ -379,13 +372,17 @@ def batch_scrape():
             print(f"Query # {num_queries}")
             print(f"Returned {num_results} tweets")
             print(str(e))
-            input()
+            #input()
+            break
 
         time.sleep(1)
 
     ### update scrape info
 
 if __name__ == "__main__":
+    ### TODO: args to switch these
+    ### TODO: command line blow out delete
+
     ### gen_queries
     #gen_queries()
 
