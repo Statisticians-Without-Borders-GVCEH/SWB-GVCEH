@@ -94,10 +94,11 @@ with aggregations:
 		st.subheader('Sample of Tweets' if option == 'Twitter' else 'Sample of Posts')
 		choice = st.selectbox('Choose a sentiment', 
 			['Negative', 'Neutral', 'Positive'])
-		st.table((current_df.loc[current_df.sentiment == choice].sample(n=5))[['tweet_id', 'text']])
+		st.table((current_df.loc[current_df.sentiment == choice].sample(n=5))[['tweet_id', 'username', 'text']])
 
 		# 2. Demo of the metrics feature
 		st.subheader('Metrics Feature')
+		st.markdown("This feature is currently based on dummy numbers and is for demonstration purposes only.")
 		mcol1, mcol2, mcol3 = st.columns(3)
 		mcol1.metric('Positive', 42, 2)
 		mcol2.metric('Neutral', 2, 3)
@@ -120,7 +121,13 @@ with aggregations:
 		st.subheader('Top Influencers')
 		
 		current_influencers = pd.DataFrame(current_df['username'].value_counts(sort=True).reset_index())
-		current_influencers.columns = ['Username', 'Number of Tweets']
+		current_influencers.columns = ['username', 'Number of Tweets']
+
+		cnum = pd.DataFrame(current_df.groupby(['username']).max(['num_followers'])['num_followers']).reset_index()
+		current_influencers = current_influencers.merge(cnum, left_on='username',
+			right_on='username', how='left')
+		current_influencers.columns = ['Username', 'Number of Tweets', 'Number of Followers']
+
 		st.table(current_influencers.iloc[0:5])
 		fig_3 = px.bar(current_influencers.iloc[0:5], x='Username', y='Number of Tweets', color_discrete_sequence=['#000080'])
 		st.plotly_chart(fig_3)
