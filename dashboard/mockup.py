@@ -5,6 +5,7 @@ from datetime import date, datetime, timedelta, time
 import gvceh_functions as gvceh
 import plotly.express as px
 import pydeck as pdk
+import altair as alt
 import numpy as np
 
 # init streamlit containers
@@ -106,7 +107,6 @@ with aggregations:
 
 		# 3. Sentiment Scores Aggregated by Category, with prior period comparison
 		st.subheader('Sentiment Scores')
-
 		if priorperiod_flag:
 			prior_start_date, prior_end_date = gvceh.get_prior_period(start_date, end_date)
 			st.write('Prior period is from', prior_start_date, 'to', prior_end_date)
@@ -135,17 +135,17 @@ with aggregations:
 		# 5. Geolocations
 		st.subheader('Locations')
 		st.write('Sentiment by topic location')
+
 		if locations_selected:
-			# locations_selected = list(map(lambda x: x.lower(), locations_selected))
-			k = current_df[current_df["search_neighbourhood"].isin(locations_selected)]
-			k = k[["search_neighbourhood", "sentiment"]]
+			current_df = current_df[current_df["search_neighbourhood"].isin(locations_selected)]
+			k = current_df[["search_neighbourhood", "sentiment"]]
 			st.write(k.pivot_table(index='search_neighbourhood',
 								   columns='sentiment',
 								   aggfunc=len,
 								   fill_value=0))
+
 		elif agg_option == 'Capital Region District (All)':
-			k = current_df
-			k = k[["search_neighbourhood", "sentiment"]]
+			k = current_df[["search_neighbourhood", "sentiment"]]
 			k_pivot = k.pivot_table(index='search_neighbourhood',
 									columns='sentiment',
 									aggfunc=len,
@@ -153,6 +153,7 @@ with aggregations:
 			st.write(k_pivot)
 		else:
 			st.sidebar.error("No options selected. Please select at least one location.")
+
 
 		if (len(locations_selected) > 0 or agg_option == 'Capital Region District (All)'):
 			real_data = gvceh.get_lat_long(k)
@@ -187,6 +188,26 @@ with aggregations:
 					),
 				],
 			))
+
+
+			# Need more data to determine how useful this will be
+			j = current_df[["search_neighbourhood", "score", "created_at"]]
+			j['created_at'] = j['created_at'].dt.date
+			wide_form = j.pivot_table(index='created_at',
+									  columns='search_neighbourhood',
+									  values='score',
+									  aggfunc='mean',
+									  fill_value=0)
+
+			wide_form = wide_form.reset_index()
+			long_form = wide_form.melt('created_at', var_name='search_neighbourhood', value_name='avg_score')
+			line_chart = alt.Chart(long_form, title="Average Sentiment Scores by Date").mark_line().encode(
+				x='yearmonthdate(created_at)',
+				y='avg_score:Q',
+				tooltip='search_neighbourhood',
+				color='search_neighbourhood:N'
+			).interactive()
+			st.altair_chart(line_chart, use_container_width=True)
 
 
 

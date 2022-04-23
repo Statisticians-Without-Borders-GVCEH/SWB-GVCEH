@@ -7,7 +7,8 @@ def get_data():
     ''' Loading the twitter and reddit datasets and generating a dictionary of dataframes.'''
 
     reddit_df = pd.read_csv('./data/demo/reddit_antiwork.csv'
-                            , parse_dates=['timestamp'], dtype={'created': object})
+                            , parse_dates=['timestamp'], dtype={'created': object,
+                                                                'score': float})
 
     twitter_df = pd.read_csv('./data/demo/GVCEH-2022-04-11-tweet-raw-sentiment.csv',
                              parse_dates=['created_at'], dtype={'tweet_id': object})
