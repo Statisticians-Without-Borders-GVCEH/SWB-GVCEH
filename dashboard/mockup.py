@@ -5,6 +5,7 @@ from datetime import date, datetime, timedelta, time
 import gvceh_functions as gvceh
 import plotly.express as px
 import pydeck as pdk
+import altair as alt
 import numpy as np
 
 # init streamlit containers
@@ -106,7 +107,6 @@ with aggregations:
 
 		# 3. Sentiment Scores Aggregated by Category, with prior period comparison
 		st.subheader('Sentiment Scores')
-
 		if priorperiod_flag:
 			prior_start_date, prior_end_date = gvceh.get_prior_period(start_date, end_date)
 			st.write('Prior period is from', prior_start_date, 'to', prior_end_date)
@@ -119,11 +119,11 @@ with aggregations:
 
 		# 4. Top Influencers
 		st.subheader('Top Influencers')
-		
+
 		current_influencers = pd.DataFrame(current_df['username'].value_counts(sort=True).reset_index())
 		current_influencers.columns = ['username', 'Number of Tweets']
 
-		cnum = pd.DataFrame(current_df.groupby(['username']).max(['num_followers'])['num_followers']).reset_index()
+		cnum = pd.DataFrame(current_df.groupby(['username']).max()['num_followers']).reset_index()
 		current_influencers = current_influencers.merge(cnum, left_on='username',
 			right_on='username', how='left')
 		current_influencers.columns = ['Username', 'Number of Tweets', 'Number of Followers']
@@ -133,36 +133,30 @@ with aggregations:
 		st.plotly_chart(fig_3)
 
 		# 5. Geolocations
-		st.subheader('Geolocations')
-
-		# Creating test data until we can use real data
-		test_data = pd.DataFrame(
-			{'Appendix A Location': ['Central Park', 'Royal Athletic Park', 'Topaz Park', 'Royal Athletic Park',
-									 'Topaz Park', 'Central Park', 'Central Park', 'Hollywood Park', 'Stadacona Park',
-									 'Downtown'],
-			 'Sentiment': ['Negative', 'Neutral', 'Positive', 'Negative', 'Positive', 'Negative', 'Neutral',
-						   'Negative', 'Neutral', 'Neutral']})
-
+		st.subheader('Locations')
+		st.write('Sentiment by topic location')
 
 		if locations_selected:
-			k = test_data[test_data["Appendix A Location"].isin(locations_selected)]
-			st.write(k.pivot_table(index='Appendix A Location',
-								   columns='Sentiment',
+			current_df = current_df[current_df["search_neighbourhood"].isin(locations_selected)]
+			k = current_df[["search_neighbourhood", "sentiment"]]
+			st.write(k.pivot_table(index='search_neighbourhood',
+								   columns='sentiment',
 								   aggfunc=len,
 								   fill_value=0))
+
 		elif agg_option == 'Capital Region District (All)':
-			k = test_data
-			k_pivot = k.pivot_table(index='Appendix A Location',
-									columns='Sentiment',
+			k = current_df[["search_neighbourhood", "sentiment"]]
+			k_pivot = k.pivot_table(index='search_neighbourhood',
+									columns='sentiment',
 									aggfunc=len,
 									fill_value=0)
 			st.write(k_pivot)
 		else:
-
 			st.sidebar.error("No options selected. Please select at least one location.")
 
+
 		if (len(locations_selected) > 0 or agg_option == 'Capital Region District (All)'):
-			test_data2 = gvceh.get_lat_long(k)
+			real_data = gvceh.get_lat_long(k)
 			st.pydeck_chart(pdk.Deck(
 				map_style='mapbox://styles/mapbox/light-v9',
 				initial_view_state=pdk.ViewState(
@@ -181,7 +175,7 @@ with aggregations:
 				layers=[
 					pdk.Layer(
 						'HexagonLayer',
-						data=test_data2,
+						data=real_data,
 						get_position='[Longitude, Latitude]',
 						auto_highlight=True,
 						elevation_scale=4,
@@ -194,6 +188,26 @@ with aggregations:
 					),
 				],
 			))
+
+
+			# Need more data to determine how useful this will be
+			j = current_df[["search_neighbourhood", "score", "created_at"]]
+			j['created_at'] = j['created_at'].dt.date
+			wide_form = j.pivot_table(index='created_at',
+									  columns='search_neighbourhood',
+									  values='score',
+									  aggfunc='mean',
+									  fill_value=0)
+
+			wide_form = wide_form.reset_index()
+			long_form = wide_form.melt('created_at', var_name='search_neighbourhood', value_name='avg_score')
+			line_chart = alt.Chart(long_form, title="Average Sentiment Scores by Date").mark_line().encode(
+				x='yearmonthdate(created_at)',
+				y='avg_score:Q',
+				tooltip='search_neighbourhood',
+				color='search_neighbourhood:N'
+			).interactive()
+			st.altair_chart(line_chart, use_container_width=True)
 
 
 
