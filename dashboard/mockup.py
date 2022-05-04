@@ -2,11 +2,16 @@
 import streamlit as st
 import pandas as pd
 from datetime import date, datetime, timedelta, time
-import gvceh_functions as gvceh
 import plotly.express as px
 import pydeck as pdk
 import altair as alt
 import numpy as np
+import gvceh_functions as gvceh
+import sharepoint_conn as sharep
+
+# testing sharepoint_conn file
+test_df = sharep.get_data_sharepoint()
+print(test_df.head())
 
 # init streamlit containers
 header = st.container()

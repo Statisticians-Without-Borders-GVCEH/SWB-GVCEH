@@ -1,0 +1,9 @@
+/* create a file called sharepoint_cred.json within your git repo locally
+gitignore will ensure this file is ignored when git tracks changes */
+
+{
+	"username":"xyz@victoriahomelessness.onmicrosoft.com",
+	"password":"thisisanexamplepassword"
+}
+
+
