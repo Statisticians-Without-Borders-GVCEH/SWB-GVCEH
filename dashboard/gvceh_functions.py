@@ -74,16 +74,17 @@ def agg_sentiments_by_category(cdf, pdf):
 
     return by_category
 
+def get_appendix_a_locations():
+    return(pd.read_csv('./data/appendices/aa.csv'))
 
 def get_lat_long(left_df):
     right_df = pd.read_csv('./data/demo/Geolocation_Mapping - Sheet1.csv')
     return left_df.merge(right_df, left_on='search_neighbourhood',
                          right_on='Appendix A Location', how='inner')
 
-
 def get_locations(agg_option):
-    df = pd.read_csv('./data/demo/Geolocation_Mapping - Sheet1.csv')
-    return df.loc[df["Type"] == agg_option, "Appendix A Location"].tolist()
+    df = pd.read_csv('./data/appendices/aa.csv')
+    return df.loc[df["Category"] == agg_option, "Location"].tolist()
 
 # def agg_tweets_by_users(cdf, pdf):
 # 	''' Aggregating number of tweets by username.'''

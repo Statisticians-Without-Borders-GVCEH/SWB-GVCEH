@@ -1,32 +1,230 @@
-﻿,Location
-0,Beacon Hill Park
-1,Beacon Hill
-2,Royal Athletic Park 
-3,Topaz Park 
-4,Topaz Park 
-5,Central Park 
-6,Stadacona Park 
-7,Oaklands Park 
-8,Irving Park
-9,Hollywood Park 
-10,Gonzalez Park 
-11,North Park 
-12,Fairfield 
-13,Downtown 
-14,Fernwood 
-15,Rockland 
-16,Oaklands 
-17,Uplands 
-18,Harris Green 
-19,Burnside 
-20,Gonzalez 
-21,Sooke 
-22,West Shore 
-23,Langford 
-24,Colwood 
-25,Metchosin 
-26,View Royal 
-27,Pandora Avenue
-28,Pandora Ave
-29,900-block of Pandora Avenue
-30,900 block
+Location,GVCEH Area,Category
+Colwood,Area 1,District
+Langford,Area 1,District
+Metchosin,Area 1,District
+Sooke,Area 1,District
+View Royal,Area 1,District
+Central Saanich,Area 1,District
+Esquimalt,Area 1,District
+Highlands,Area 1,District
+Juan de Fuca,Area 1,District
+North Saanich,Area 1,District
+Oak Bay,Area 1,District
+Saanich,Area 1,District
+Salt Spring Island,Area 1,District
+Sidney,Area 1,District
+Southern Gulf Islands,Area 1,District
+Victoria,Area 1,District
+Saanich Core,Area 1,District
+Rural Saanich,Area 1,District
+Central Saanich,Area 1,District
+North Saanich,Area 1,District
+East Sooke,Area 1,District
+Sooke Town Centre,Area 1,District
+Downtown,Area 2,Neighborhood
+Fernwood,Area 2,Neighborhood
+Gonzales,Area 2,Neighborhood
+Harris Green,Area 2,Neighborhood
+North Park,Area 2,Neighborhood
+Oaklands,Area 2,Neighborhood
+Rockland,Area 2,Neighborhood
+Uplands,Area 2,Neighborhood
+Arbutus,Area 2,Neighborhood
+Ardmore,Area 2,Neighborhood
+Bear Mountain,Area 2,Neighborhood
+Beaver Lake,Area 2,Neighborhood
+Belmont Park,Area 2,Neighborhood
+Blanshard,Area 2,Neighborhood
+Blenkinsop,Area 2,Neighborhood
+Brentwood Bay,Area 2,Neighborhood
+Broadmead-Sunnymead,Area 2,Neighborhood
+Broom Hill,Area 2,Neighborhood
+Burnside-Gorge,Area 2,Neighborhood
+Cadboro Bay,Area 2,Neighborhood
+Carey,Area 2,Neighborhood
+Cedar Hill,Area 2,Neighborhood
+Chinatown,Area 2,Neighborhood
+Cloake Hill,Area 2,Neighborhood
+Colville Road,Area 2,Neighborhood
+Colwood Corners,Area 2,Neighborhood
+Cook Street Village,Area 2,Neighborhood
+Cordova Bay,Area 2,Neighborhood
+Craigflower,Area 2,Neighborhood
+Dean Park,Area 2,Neighborhood
+Deep Cove,Area 2,Neighborhood
+DND,Area 2,Neighborhood
+Durrance Lake,Area 2,Neighborhood
+Elk Lake,Area 2,Neighborhood
+Estevan,Area 2,Neighborhood
+Fairfield-Gonzales,Area 2,Neighborhood
+Florence Lake,Area 2,Neighborhood
+Glanford,Area 2,Neighborhood
+Glen Lake,Area 2,Neighborhood
+Goldstream,Area 2,Neighborhood
+Goldstream Meadows,Area 2,Neighborhood
+Gonzales (Foul Bay),Area 2,Neighborhood
+Gordon Head,Area 2,Neighborhood
+Gorge Vale,Area 2,Neighborhood
+Happy Valley,Area 2,Neighborhood
+Hatley Park,Area 2,Neighborhood
+Hillside-Quadra,Area 2,Neighborhood
+Humboldt Valley,Area 2,Neighborhood
+Interurban,Area 2,Neighborhood
+Island View,Area 2,Neighborhood
+James Bay,Area 2,Neighborhood
+Jubilee,Area 2,Neighborhood
+Kemp Lake,Area 2,Neighborhood
+Lake Hill,Area 2,Neighborhood
+Lands End,Area 2,Neighborhood
+Luxton,Area 2,Neighborhood
+Maplewood,Area 2,Neighborhood
+Marigold,Area 2,Neighborhood
+Matheson Lake,Area 2,Neighborhood
+Mayfair,Area 2,Neighborhood
+Mill Hill,Area 2,Neighborhood
+Millstream,Area 2,Neighborhood
+Mt. Douglas,Area 2,Neighborhood
+Mt. Tolmie,Area 2,Neighborhood
+North Jubilee,Area 2,Neighborhood
+North Quadra,Area 2,Neighborhood
+Oak Bay,Area 2,Neighborhood
+Otter Point,Area 2,Neighborhood
+Parklands,Area 2,Neighborhood
+Pat Bay,Area 2,Neighborhood
+Patricia Bay,Area 2,Neighborhood
+Prospect Lake,Area 2,Neighborhood
+Quadra,Area 2,Neighborhood
+Quadra Village,Area 2,Neighborhood
+Queenswood,Area 2,Neighborhood
+Ravenwood,Area 2,Neighborhood
+Rock Bay,Area 2,Neighborhood
+Rockheights,Area 2,Neighborhood
+Rocky Point,Area 2,Neighborhood
+Royal Oak,Area 2,Neighborhood
+Royal Roads,Area 2,Neighborhood
+Saanichton,Area 2,Neighborhood
+Saseenos,Area 2,Neighborhood
+Saxe Point,Area 2,Neighborhood
+Shelbourne,Area 2,Neighborhood
+Shoreline,Area 2,Neighborhood
+Songhees,Area 2,Neighborhood
+South Jubilee,Area 2,Neighborhood
+Strawberry Vale,Area 2,Neighborhood
+Sunriver,Area 2,Neighborhood
+Swartz Bay,Area 2,Neighborhood
+Ten Mile Point,Area 2,Neighborhood
+The Gorge,Area 2,Neighborhood
+Thetis Heights,Area 2,Neighborhood
+Thetis Lake,Area 2,Neighborhood
+Tillicum,Area 2,Neighborhood
+Triangle Mountain,Area 2,Neighborhood
+Vic West,Area 2,Neighborhood
+Victoria West,Area 2,Neighborhood
+West Bay,Area 2,Neighborhood
+West Burnside,Area 2,Neighborhood
+Westhills,Area 2,Neighborhood
+Whiff,Area 2,Neighborhood
+William Head,Area 2,Neighborhood
+Willis Point,Area 2,Neighborhood
+Willows Beach,Area 2,Neighborhood
+Windsor Park,Area 2,Neighborhood
+Work Point,Area 2,Neighborhood
+South Oak Bay,Area 2,Neighborhood
+North Oak Bay,Area 2,Neighborhood
+Beacon Hill Park,Area 3,Parks
+Central Park,Area 3,Parks
+Gonzales Park,Area 3,Parks
+Hollywood Park,Area 3,Parks
+Irving Park,Area 3,Parks
+Oaklands Park,Area 3,Parks
+Royal Athletic Park,Area 3,Parks
+Stadacona Park,Area 3,Parks
+Topaz Park,Area 3,Parks
+Agamemnon and Eleni Kasapi Park,Area 3,Parks
+Arbutus Park,Area 3,Parks
+Arm Street Park,Area 3,Parks
+Balfour Playlot,Area 3,Parks
+Banfield Park,Area 3,Parks
+Barnard Park,Area 3,Parks
+Belleville Street Green,Area 3,Parks
+Blackwood Park,Area 3,Parks
+Brooke Street Park,Area 3,Parks
+Burleith Park,Area 3,Parks
+Bushby Park,Area 3,Parks
+Cecelia Cove Park,Area 3,Parks
+Cecelia Ravine Park,Area 3,Parks
+Chapman Park,Area 3,Parks
+Clawthorpe Park,Area 3,Parks
+Clover Point,Area 3,Parks
+Cridge Park,Area 3,Parks
+David Foster Harbour Pathway,Area 3,Parks
+David Spencer Park,Area 3,Parks
+Fern Street Park,Area 3,Parks
+Fisherman’s Wharf Park,Area 3,Parks
+Franklin Green,Area 3,Parks
+Gower Park,Area 3,Parks
+Haegert Park,Area 3,Parks
+Harris Green,Area 3,Parks
+Highview Park,Area 3,Parks
+Highview Park,Area 3,Parks
+Hillside Park,Area 3,Parks
+Holland Point,Area 3,Parks
+Jackson Street Park,Area 3,Parks
+Kings Park,Area 3,Parks
+Lewis Street Park,Area 3,Parks
+Little Ross Bay Beach,Area 3,Parks
+MacDonald Park,Area 3,Parks
+Mars Street Park,Area 3,Parks
+Moss Rocks Park,Area 3,Parks
+Mt. Stephens Park,Area 3,Parks
+Oaklands (Holly) Green,Area 3,Parks
+Oswald Park,Area 3,Parks
+Pemberton Park,Area 3,Parks
+Pioneer Square,Area 3,Parks
+Point Ellice Park,Area 3,Parks
+Quadra Heights Park,Area 3,Parks
+Quadra Park,Area 3,Parks
+Queens Park,Area 3,Parks
+Rainbow Park,Area 3,Parks
+Raynor Park,Area 3,Parks
+Redfern Park,Area 3,Parks
+Regatta Point (Railyards),Area 3,Parks
+Robert Porter Park,Area 3,Parks
+Ross Bay Cemetery,Area 3,Parks
+Saghalie Park,Area 3,Parks
+sč̓əmaθən / Peter Pollen Waterfront Park,Area 3,Parks
+Selkirk Green,Area 3,Parks
+Sitkum Park,Area 3,Parks
+Songhees Hillside Park,Area 3,Parks
+Songhees Walkway,Area 3,Parks
+Stevenson Park,Area 3,Parks
+Sumas Park,Area 3,Parks
+Summit Park,Area 3,Parks
+Terrace Park,Area 3,Parks
+Todd Park,Area 3,Parks
+Triangle Park,Area 3,Parks
+Viaduct Park,Area 3,Parks
+Vic West Park,Area 3,Parks
+Victoria West Park,Area 3,Parks
+Wark Street Park,Area 3,Parks
+Wesley Park,Area 3,Parks
+Galloping Goose,Area 4,Other
+Selkirk Trestle,Area 4,Other
+Lochside,Area 4,Other
+Juan de Fuca,Area 4,Other
+Coast Salish,Area 5,Indigenous Peoples
+Nuu-chah-nulth,Area 5,Indigenous Peoples
+Kwakwaka’wakw,Area 5,Indigenous Peoples
+Lekwungen,Area 5,Indigenous Peoples
+Songhees,Area 5,Indigenous Peoples
+Esquimalt,Area 5,Indigenous Peoples
+WSÁNEĆ,Area 5,Indigenous Peoples
+Tsartlip,Area 5,Indigenous Peoples
+Tsawout,Area 5,Indigenous Peoples
+Pauquachin,Area 5,Indigenous Peoples
+Tseycum,Area 5,Indigenous Peoples
+Malahat,Area 5,Indigenous Peoples
+Nuu-chah-nulth,Area 5,Indigenous Peoples
+Sc'ianew,Area 5,Indigenous Peoples
+T'Sou-ke,Area 5,Indigenous Peoples
+Pacheedaht,Area 5,Indigenous Peoples
