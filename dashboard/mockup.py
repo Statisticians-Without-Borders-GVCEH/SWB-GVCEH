@@ -7,11 +7,11 @@ import pydeck as pdk
 import altair as alt
 import numpy as np
 import gvceh_functions as gvceh
-import sharepoint_conn as sharep
+# import sharepoint_conn as sharep
 
 # testing sharepoint_conn file
-test_df = sharep.get_data_sharepoint()
-print(test_df.head())
+# test_df = sharep.get_data_sharepoint()
+# print(test_df.head())
 
 # init streamlit containers
 header = st.container()
@@ -68,8 +68,15 @@ with sidebar:
 
 	st.sidebar.header('3. Locations')
 
+	appendix_a = gvceh.get_appendix_a_locations()
+	appendix_a_categories = appendix_a["Category"].unique()
+	list2 = appendix_a_categories.tolist()
+	list1 = ["Capital Region District (All)"]
+	agg_levels = list1 + list2
+
+
+
 	locations_selected = []
-	agg_levels = ['Capital Region District (All)', 'Neighborhood', 'Park']
 	agg_option = st.sidebar.selectbox('Select an aggregation level:', agg_levels)
 	location_option = gvceh.get_locations(agg_option)
 	if location_option:
@@ -161,46 +168,20 @@ with aggregations:
 
 
 		if (len(locations_selected) > 0 or agg_option == 'Capital Region District (All)'):
-			real_data = gvceh.get_lat_long(k)
-			st.pydeck_chart(pdk.Deck(
-				map_style='mapbox://styles/mapbox/light-v9',
-				initial_view_state=pdk.ViewState(
-					latitude=48.45,
-					longitude=-123.37,
-					zoom=11,
-					pitch=50,
-					tooltip=True,
-				),
-				tooltip={
-					'html': "<b>Number of Tweets:</b> {elevationValue}",
-					'style': {
-						'color': 'white'
-					}
-				},
-				layers=[
-					pdk.Layer(
-						'HexagonLayer',
-						data=real_data,
-						get_position='[Longitude, Latitude]',
-						auto_highlight=True,
-						elevation_scale=4,
-						radius=200,
-						pickable=True,
-						elevation_range=[10, 100],
-						get_fill_color=[69, 162, 128, 255],
-						extruded=True,
-						coverage=1,
-					),
-				],
-			))
-
-
 			# Need more data to determine how useful this will be
-			j = current_df[["search_neighbourhood", "score", "created_at"]]
+			conditions = [
+				(current_df['sentiment'] == "Neutral"),
+				(current_df['sentiment'] == "Negative"),
+				(current_df['sentiment'] == "Positive")
+			]
+			values = [0, current_df["score"] * -1, current_df["score"]]
+			current_df["polarity"] = np.select(conditions, values)
+
+			j = current_df[["search_neighbourhood", "polarity", "created_at"]]
 			j['created_at'] = j['created_at'].dt.date
 			wide_form = j.pivot_table(index='created_at',
 									  columns='search_neighbourhood',
-									  values='score',
+									  values='polarity',
 									  aggfunc='mean',
 									  fill_value=0)
 
@@ -213,6 +194,43 @@ with aggregations:
 				color='search_neighbourhood:N'
 			).interactive()
 			st.altair_chart(line_chart, use_container_width=True)
+
+
+		# 	real_data = gvceh.get_lat_long(k)
+		# 	st.pydeck_chart(pdk.Deck(
+		# 		map_style='mapbox://styles/mapbox/light-v9',
+		# 		initial_view_state=pdk.ViewState(
+		# 			latitude=48.45,
+		# 			longitude=-123.37,
+		# 			zoom=11,
+		# 			pitch=50,
+		# 			tooltip=True,
+		# 		),
+		# 		tooltip={
+		# 			'html': "<b>Number of Tweets:</b> {elevationValue}",
+		# 			'style': {
+		# 				'color': 'white'
+		# 			}
+		# 		},
+		# 		layers=[
+		# 			pdk.Layer(
+		# 				'HexagonLayer',
+		# 				data=real_data,
+		# 				get_position='[Longitude, Latitude]',
+		# 				auto_highlight=True,
+		# 				elevation_scale=4,
+		# 				radius=200,
+		# 				pickable=True,
+		# 				elevation_range=[10, 100],
+		# 				get_fill_color=[69, 162, 128, 255],
+		# 				extruded=True,
+		# 				coverage=1,
+		# 			),
+		# 		],
+		# 	))
+
+
+
 
 
 
