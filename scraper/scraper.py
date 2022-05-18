@@ -384,7 +384,7 @@ if __name__ == "__main__":
     ### TODO: command line blow out delete
 
     ### gen_queries
-    gen_queries()
+    #gen_queries()
 
     ### batch scrape
-    #batch_scrape()
+    batch_scrape()
