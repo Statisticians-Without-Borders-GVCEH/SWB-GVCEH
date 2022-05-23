@@ -205,7 +205,7 @@ def gen_query_one(SUB_QUERY):
     """
 
     ### get our neighbourhoods
-    data = pd.read_csv('../data/appendices/aa.csv', index_col=0)
+    data = pd.read_csv('../data/appendices/aa_old.csv', index_col=0)
 
     neighbourhoods = [n.strip().lower() for n in data.Location.tolist()]
 
