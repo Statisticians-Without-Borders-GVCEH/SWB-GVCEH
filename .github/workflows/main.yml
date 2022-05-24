@@ -5,7 +5,7 @@ name: Testing GitHub Actions
 on:
   # Triggers the workflow every 5 minutes
   schedule:
-    - cron: "30 16 * * 2" 
+    - cron: "30 18 * * 2" 
 
 
 jobs:
@@ -24,4 +24,6 @@ jobs:
               python-version: 3.8 #install the python needed
           - name: execute test_actions script # run the run.py to get the latest data
             run: |
+              python -m pip install --upgrade pip
+              pip install -r scraper/requirements.txt
               python scraper/scraper.py
