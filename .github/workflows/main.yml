@@ -5,7 +5,7 @@ name: Testing GitHub Actions
 on:
   # Triggers the workflow every 5 minutes
   schedule:
-    - cron: "30 18 * * 2" 
+    - cron: "20 18 * * 2" 
 
 
 jobs:
