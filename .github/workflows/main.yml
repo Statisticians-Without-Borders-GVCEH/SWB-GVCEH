@@ -24,4 +24,4 @@ jobs:
               python-version: 3.8 #install the python needed
           - name: execute test_actions script # run the run.py to get the latest data
             run: |
-              scraper/test_actions.py
+              python test_actions.py
