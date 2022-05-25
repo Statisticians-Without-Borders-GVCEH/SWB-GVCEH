@@ -1,15 +1,21 @@
 import os
 import pandas as pd
+import requests
+import io
 
-# path = '../scraper/data/'
-path = os.path.dirname(os.path.abspath(__file__))
-path = path.replace('modeling', 'scraper/data/')
-print(path)
-files = os.listdir(path)
-last_file_path = path + files[-1]
-df = pd.read_csv(last_file_path)
+url = 'https://raw.githubusercontent.com/sheilaflood/SWB-GVCEH/main/scraper/data/'
+file = 'GVCEH-2022-04-10-tweet-raw.csv'
+old_url = url + file
 
 
-new_file_path = last_file_path.replace('scraper', 'modeling').replace('raw.csv', 'scored.csv')
-df.to_csv(new_file_path)
-print('done!')
+read_data = requests.get(old_url).content
+df = pd.read_csv(io.StringIO(read_data.decode('utf-8')))
+print(df.head())
+
+
+new_url = url.replace('scraper', 'modeling')
+new_file = file.replace('raw.csv', 'scored.csv')
+
+requests.post(new_url, data = df.to_csv(new_file))
+
+print('Done!')
