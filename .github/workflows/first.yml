@@ -13,7 +13,7 @@ jobs:
   # This workflow contains a single job called "cron"
   cron:
     # The type of runner that the job will run on
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -32,5 +32,4 @@ jobs:
           pip install --upgrade setuptools
           pip install pandas
           pip install requests
-          pip install io
           python modeling/model.py
