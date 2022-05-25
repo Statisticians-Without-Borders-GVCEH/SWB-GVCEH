@@ -4,8 +4,6 @@ import io
 
 # ssl._create_default_https_context = ssl._create_unverified_context
 
-username = 'sheilaflood'
-token = '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'
 
 github_session = requests.Session()
 github_session.auth = (username, token)
