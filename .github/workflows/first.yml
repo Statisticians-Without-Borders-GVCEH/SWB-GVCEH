@@ -34,6 +34,6 @@ jobs:
           pip install pandas
           pip install requests
           pip install PyGithub
-          echo ${{ secrets.USERNAME }}
-          # TOKEN: ${{ secrets.TOKEN }}
-          # python modeling/model.py
+          USERNAME: ${{ secrets.USERNAME }}
+          TOKEN: ${{ secrets.TOKEN }}
+          python modeling/model.py
