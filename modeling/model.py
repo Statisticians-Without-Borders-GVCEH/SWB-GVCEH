@@ -2,14 +2,13 @@ import pandas as pd
 import requests
 import io
 import os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from github import Github
 
-load_dotenv() #take environment variables from .env
+# load_dotenv() #take environment variables from .env
 
-USERNAME = os.getenv("USERNAME")
-TOKEN = os.getenv("TOKEN")
-GITHUB_REPO = 'SWB-GVCEH'
+USERNAME = os.environ["USERNAME"]
+TOKEN = os.environ["TOKEN"]
 
 g = Github(USERNAME, TOKEN)
 user = g.get_user(USERNAME)
