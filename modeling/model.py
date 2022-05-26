@@ -27,7 +27,7 @@ while contents:
         all_files.append(str(file).replace('ContentFile(path="','').replace('")',''))
 
 # Read from github
-with open('../scraper/data/GVCEH-2022-05-23-tweet-raw.csv', 'r') as file:
+with open('./scraper/data/GVCEH-2022-05-23-tweet-raw.csv', 'r') as file:
     content = file.read()
 
 # upload to github
