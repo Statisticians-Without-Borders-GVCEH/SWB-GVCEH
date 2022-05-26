@@ -27,6 +27,9 @@ jobs:
         with:
           python-version: 3.8 #install the python needed
       - name: execute model.py script 
+        env: 
+          USERNAME: ${{ secrets.USERNAME }}
+          TOKEN: ${{ secrets.TOKEN }}
         run: |
           python -m pip install --upgrade pip
           pip install --upgrade setuptools
@@ -34,7 +37,4 @@ jobs:
           pip install pandas
           pip install requests
           pip install PyGithub
-          echo ${{ secrets.USERNAME }}
-          # USERNAME: ${{ secrets.USERNAME }}
-          # TOKEN: ${{ secrets.TOKEN }}
           python modeling/model.py
