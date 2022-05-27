@@ -9,7 +9,11 @@ import tensorflow
 from transformers import pipeline
 
 
-load_dotenv() #take environment variables from .env
+# load_dotenv() #take environment variables from .env
+
+# load environment variables
+USERNAME = os.getenv["USERNAME"]
+TOKEN = os.getenv["TOKEN"]
 
 # create the model
 model = pipeline("sentiment-analysis",
@@ -17,11 +21,6 @@ model = pipeline("sentiment-analysis",
                  device=0
                  )
 model.tokenizer.model_max_length = 512
-
-
-# load environment variables
-USERNAME = os.getenv["USERNAME"]
-TOKEN = os.getenv["TOKEN"]
 
 # open github api connection
 g = Github(USERNAME, TOKEN)
