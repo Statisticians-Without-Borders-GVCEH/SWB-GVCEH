@@ -2,7 +2,7 @@ import pandas as pd
 import requests
 import io
 import os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from github import Github
 import csv
 import tensorflow
@@ -12,8 +12,8 @@ from transformers import pipeline
 # load_dotenv() #take environment variables from .env
 
 # load environment variables
-USERNAME = os.getenv["USERNAME"]
-TOKEN = os.getenv["TOKEN"]
+USERNAME = os.environ["USERNAME"]
+TOKEN = os.environ["TOKEN"]
 
 # create the model
 model = pipeline("sentiment-analysis",
