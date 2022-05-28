@@ -7,6 +7,8 @@ import pydeck as pdk
 import altair as alt
 import numpy as np
 import gvceh_functions as gvceh
+from PIL import Image
+
 # import sharepoint_conn as sharep
 
 # testing sharepoint_conn file
@@ -31,7 +33,8 @@ hide_table_row_index = """
 st.markdown(hide_table_row_index, unsafe_allow_html=True)
 
 # import data
-dsource_dict = gvceh.get_data()
+dsource_dict = gvceh.get_data() # replace with get_seed
+inf = gvceh.get_seed() # remove
 
 # import the help dictionary
 readme = gvceh.tooltips()
@@ -87,13 +90,34 @@ with sidebar:
 use_df = dsource_dict[option]
 current_df, prior_df = gvceh.get_frames(start_date, end_date, use_df)
 sentiments_by_category = gvceh.agg_sentiments_by_category(current_df, prior_df)
+image = Image.open('./dashboard/branding.png')
 
+# wt_try = gvceh.weighted_agg_sentiments_by_category(current_df, prior_df, 0.7)
 
 
 with header:
 
+	st.image(image)
+
 	st.title('Homelessness in Greater Victoria')
 	st.markdown('''This dashboard gives a sense of the sentiment around homelessness in the Greater Victoria area.''')
+
+	st.write(current_df.head())
+
+	st.download_button(
+     label="Download data as CSV",
+     data=use_df.to_csv().encode('utf-8'),
+     file_name='data.csv')
+
+	# st.write(wt_try)
+	st.subheader('Tweets Per Day')
+
+	tweets_per_day = use_df.groupby([use_df['created_at'].dt.date]).tweet_id.nunique()
+
+	fig_0 = px.line(tweets_per_day, x=tweets_per_day.index, y="tweet_id",
+		labels={"tweet_id":"Number of Tweets", "created_at":"Date"})
+	fig_0.update_traces(line_color='#BF4C41')
+	st.plotly_chart(fig_0)
 
 with aggregations:
 
@@ -109,15 +133,7 @@ with aggregations:
 			['Negative', 'Neutral', 'Positive'])
 		st.table((current_df.loc[current_df.sentiment == choice].sample(n=5))[['tweet_id', 'username', 'text']])
 
-		# 2. Demo of the metrics feature
-		st.subheader('Metrics Feature')
-		st.markdown("This feature is currently based on dummy numbers and is for demonstration purposes only.")
-		mcol1, mcol2, mcol3 = st.columns(3)
-		mcol1.metric('Positive', 42, 2)
-		mcol2.metric('Neutral', 2, 3)
-		mcol3.metric('Negative', 4, 5)
-
-		# 3. Sentiment Scores Aggregated by Category, with prior period comparison
+		# 2. Sentiment Scores Aggregated by Category, with prior period comparison
 		st.subheader('Sentiment Scores')
 		if priorperiod_flag:
 			prior_start_date, prior_end_date = gvceh.get_prior_period(start_date, end_date)
@@ -129,22 +145,33 @@ with aggregations:
 			fig_2 = px.bar(sentiments_by_category, x='Sentiment', y='Current', color_discrete_sequence=['#000080']*3)
 			st.plotly_chart(fig_2)
 
-		# 4. Top Influencers
+		# 3. Top Influencers
 		st.subheader('Top Influencers')
+		
+		display_tweets = st.checkbox('Display tweets by top influencers.')
 
-		current_influencers = pd.DataFrame(current_df['username'].value_counts(sort=True).reset_index())
-		current_influencers.columns = ['username', 'Number of Tweets']
+		current_influencers = gvceh.top_influencers(current_df)
+		# st.table(current_influencers)
+		if display_tweets:
+			st.table(current_df.loc[current_df['username'].isin(current_influencers.iloc[0:5]['username'])][['username','text']])
 
-		cnum = pd.DataFrame(current_df.groupby(['username']).max()['num_followers']).reset_index()
-		current_influencers = current_influencers.merge(cnum, left_on='username',
-			right_on='username', how='left')
-		current_influencers.columns = ['Username', 'Number of Tweets', 'Number of Followers']
+		
 
-		st.table(current_influencers.iloc[0:5])
-		fig_3 = px.bar(current_influencers.iloc[0:5], x='Username', y='Number of Tweets', color_discrete_sequence=['#000080'])
+
+		# current_influencers = pd.DataFrame(current_df['username'].value_counts(sort=True).reset_index())
+		# st.write(current_influencers)
+		# current_influencers.columns = ['username', 'Number of Tweets']
+
+		# cnum = pd.DataFrame(current_df.groupby(['username']).max()['num_followers']).reset_index()
+		# current_influencers = current_influencers.merge(cnum, left_on='username',
+		# 	right_on='username', how='left')
+		# current_influencers.columns = ['Username', 'Number of Tweets', 'Number of Followers']
+
+		# st.table(current_influencers.iloc[0:5])
+		fig_3 = px.bar(current_influencers.iloc[0:5], x='username', y='score', color_discrete_sequence=['#000080'])
 		st.plotly_chart(fig_3)
 
-		# 5. Geolocations
+		# 4. Geolocations
 		st.subheader('Locations')
 		st.write('Sentiment by topic location')
 
