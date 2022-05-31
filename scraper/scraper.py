@@ -26,7 +26,8 @@ TESTING = False
 
 QUERY_MAX_LENGTH = 512
 MAX_PER_15 = 9999 ### TODO: Find this limit
-SUB_QUERY_CHUNKS = 6
+SUB_QUERY_CHUNKS = 10
+NUM_ACCOUNTS_TO_TARGET = 5
 QUERY_CACHE_FILE = "querylist.pkl"
 
 
@@ -274,7 +275,7 @@ def gen_query_three(SUB_QUERY):
     ### loop through like above to generate queries
     query = []
 
-    for grp in chunker(orgs+pers, 5):
+    for grp in chunker(orgs+pers, NUM_ACCOUNTS_TO_TARGET):
 
         subtext = []
         for name in grp:
