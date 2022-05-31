@@ -40,7 +40,7 @@ while contents:
         all_files.append(str(file).replace('ContentFile(path="','').replace('")',''))
 
 # Read from github
-with open('./scraper/data/GVCEH-2022-05-23-tweet-raw.csv', 'r') as file:
+with open('./scraper/data/GVCEH-2022-04-10-tweet-raw.csv', 'r') as file:
     df = pd.read_csv(file)
     # print(df.info())
 
@@ -58,6 +58,6 @@ df.head()
 stuff = df.to_csv()
 
 # upload to github
-git_file = 'modeling/data/GVCEH-2022-05-23-tweet-scored.csv'
+git_file = 'modeling/data/GVCEH-2022-04-10-tweet-scored.csv'
 repo.create_file(git_file, "committing new file", stuff, branch="main")
 print('Done!!!')
