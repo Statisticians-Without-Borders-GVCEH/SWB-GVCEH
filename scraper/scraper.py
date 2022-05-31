@@ -26,8 +26,9 @@ TESTING = False
 
 QUERY_MAX_LENGTH = 512
 MAX_PER_15 = 9999 ### TODO: Find this limit
-SUB_QUERY_CHUNKS = 10
-NUM_ACCOUNTS_TO_TARGET = 5
+SUB_QUERY_CHUNKS = 10 ### how many queries we split Appendix C + E + D into
+NUM_ACCOUNTS_TO_TARGET = 5 ### How many queries we split Appendix B into
+NEIGHBOURHOOD_CHUNKS = 10 ### split neighbourhood into how many chunks ?
 QUERY_CACHE_FILE = "querylist.pkl"
 
 
@@ -181,16 +182,19 @@ def load_keywords():
         'ae': kw3
     }
 
-def prep_subq(KEYWORDS_DICT):
+def prep_subq(KEYWORDS_DICT, CHUNKS):
     """
         Generates the list of strings
         Each string is the keyword subquery
     """
     ### make one list of keywords
-    allkw = sum(KEYWORDS_DICT.values(), [])
+    if type(KEYWORDS_DICT) is not list:
+        allkw = sum(KEYWORDS_DICT.values(), [])
+    else:
+        allkw = KEYWORDS_DICT
 
     ### chunk it down, we can't exceed 512 character a query
-    allkw = [allkw[i::SUB_QUERY_CHUNKS] for i in range(SUB_QUERY_CHUNKS)]
+    allkw = [allkw[i::CHUNKS] for i in range(CHUNKS)]
 
     subq = []
 
@@ -210,12 +214,14 @@ def gen_query_one(SUB_QUERY):
 
     neighbourhoods = [n.strip().lower() for n in data.Location.tolist()]
 
+    neighbourhoods = prep_subq(neighbourhoods, NEIGHBOURHOOD_CHUNKS)
+
     ### now to make our queries with the neighbourhoods
     query1 = []
 
     for n in neighbourhoods:
         for kws in SUB_QUERY:
-            querytext = f"{n} ({kws}) lang:en -is:retweet"
+            querytext = f"({n}) ({kws}) lang:en -is:retweet"
             if len(querytext) > QUERY_MAX_LENGTH: 
                 print("WARNING: QUERY 1 TOO LARGE")
                 print("CHUNK KEYWORD UNION SMALLER")
@@ -300,7 +306,7 @@ def gen_queries():
 
     ### generate query keyword paramteres
     ### prep keyword union
-    subq = prep_subq(keywords)
+    subq = prep_subq(keywords, SUB_QUERY_CHUNKS)
 
     # query 1 - neighbourhood keyword products 
     print("Generating Query 1...")
