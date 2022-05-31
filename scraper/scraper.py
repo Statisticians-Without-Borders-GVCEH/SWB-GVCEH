@@ -24,8 +24,11 @@ ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
 MAX_TWEETS = 100
 TESTING = False
 
-QUERY_MAX_LENGTH = 512
+
 MAX_PER_15 = 9999 ### TODO: Find this limit
+QUERY_START_AT = 0
+
+QUERY_MAX_LENGTH = 512
 SUB_QUERY_CHUNKS = 10 ### how many queries we split Appendix C + E + D into
 NUM_ACCOUNTS_TO_TARGET = 5 ### How many queries we split Appendix B into
 NEIGHBOURHOOD_CHUNKS = 10 ### split neighbourhood into how many chunks ?
@@ -349,14 +352,19 @@ def batch_scrape():
     ### probably manage the data file
 
     ### figure out what attempt at scraping this is?
-    job_n = 0
-    print(f"Batch job #{job_n} today.")
+    #job_n = 0
+    #print(f"Batch job #{job_n} today.")
 
     num_queries = 0
     num_results = 0
 
     ### pull those n queries
-    our_queries = query_cache[MAX_PER_15*job_n : MAX_PER_15 * (job_n+1)]
+    #our_queries = query_cache[MAX_PER_15*job_n : MAX_PER_15 * (job_n+1)]
+
+    ### because of batching, we want to run as many queries as we can
+    ### when we break -> store that query number, so next time we start there
+    ### TODO: STORE ON BREAK
+    our_queries = query_cache[QUERY_START_AT:]
 
     for q in our_queries:
 
