@@ -25,7 +25,7 @@ MAX_TWEETS = 100
 TESTING = False
 
 QUERY_MAX_LENGTH = 512
-MAX_PER_15 = 9999 ### TODO: Find this limit
+MAX_PER_15 = 409 ### TODO: Find this limit
 SUB_QUERY_CHUNKS = 10 ### how many queries we split Appendix C + E + D into
 NUM_ACCOUNTS_TO_TARGET = 5 ### How many queries we split Appendix B into
 NEIGHBOURHOOD_CHUNKS = 10 ### split neighbourhood into how many chunks ?
@@ -349,7 +349,7 @@ def batch_scrape():
     ### probably manage the data file
 
     ### figure out what attempt at scraping this is?
-    job_n = 0
+    job_n = 1
     print(f"Batch job #{job_n} today.")
 
     num_queries = 0
