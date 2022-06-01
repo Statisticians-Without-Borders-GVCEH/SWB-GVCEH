@@ -43,7 +43,7 @@ QUERY_MAX_LENGTH = 512
 SUB_QUERY_CHUNKS = 10 ### how many queries we split Appendix C + E + D into
 NUM_ACCOUNTS_TO_TARGET = 5 ### How many queries we split Appendix B into
 NEIGHBOURHOOD_CHUNKS = 10 ### split neighbourhood into how many chunks ?
-QUERY_CACHE_FILE = "querylist.pkl"
+QUERY_CACHE_FILE = "./scraper/querylist.pkl"
 
 
 client = tw.Client(bearer_token=BEARER_TOKEN)
