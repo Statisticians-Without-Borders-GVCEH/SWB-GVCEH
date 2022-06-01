@@ -7,17 +7,28 @@ import time
 import tweepy as tw
 import pandas as pd 
 
-from pprint import pprint
-from dotenv import load_dotenv
 
-load_dotenv() # imprt out enviroment variables
- 
-API_KEY = os.environ.get("API_KEY") # consumer
-API_SECRET_KEY = os.environ.get("API_SECRET_KEY") # consumer
-BEARER_TOKEN = os.environ.get("BEARER_TOKEN")
+# from pprint import pprint
+# from dotenv import load_dotenv
+#
+# load_dotenv() # imprt out enviroment variables
+#
+# API_KEY = os.environ.get("API_KEY") # consumer
+# API_SECRET_KEY = os.environ.get("API_SECRET_KEY") # consumer
+# BEARER_TOKEN = os.environ.get("BEARER_TOKEN")
+#
+# ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
+# ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
 
-ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
-ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
+# load environment variables using secret tokens
+API_KEY = os.environ["API_KEY"]
+API_SECRET_KEY = os.environ["API_SECRET_KEY"]
+BEARER_TOKEN = os.environ["BEARER_TOKEN"]
+ACCESS_TOKEN = os.environ["ACCESS_TOKEN"]
+ACCESS_TOKEN_SECRET = os.environ["ACCESS_TOKEN_SECRET"]
+
+USERNAME = os.environ["USERNAME"] # for github api
+TOKEN = os.environ["TOKEN"] # for github api
 
 
 ### setting up the config
@@ -170,13 +181,13 @@ def load_keywords():
             'ae': []
         }
     """
-    data = pd.read_csv('../data/appendices/ac.csv', index_col=0)
+    data = pd.read_csv('./data/appendices/ac.csv', index_col=0)
     kw1 = [k.strip().lower() for k in data.Organizations.tolist()]
 
-    data = pd.read_csv('../data/appendices/ad.csv', index_col=0)
+    data = pd.read_csv('./data/appendices/ad.csv', index_col=0)
     kw2 = [k.strip().lower() for k in data.sectors.tolist()]
 
-    data = pd.read_csv('../data/appendices/ae.csv', index_col=0)
+    data = pd.read_csv('./data/appendices/ae.csv', index_col=0)
     kw3 = [k.strip().lower() for k in data.word.tolist()]
 
     return {
@@ -213,7 +224,7 @@ def gen_query_one(SUB_QUERY):
     """
 
     ### get our neighbourhoods
-    data = pd.read_csv('../data/appendices/aa_old.csv', index_col=0)
+    data = pd.read_csv('./data/appendices/aa_old.csv', index_col=0)
 
     neighbourhoods = [n.strip().lower() for n in data.Location.tolist()]
 
@@ -273,11 +284,11 @@ def gen_query_three(SUB_QUERY):
     """
 
     ### load the names from the appendix
-    data = pd.read_csv('../data/appendices/aborganizations.csv', index_col=0)
+    data = pd.read_csv('./data/appendices/aborganizations.csv', index_col=0)
 
     orgs = [n.strip().lower() for n in data.Organizations.tolist()]
 
-    data = pd.read_csv('../data/appendices/abpersons.csv', index_col=0)
+    data = pd.read_csv('./data/appendices/abpersons.csv', index_col=0)
 
     pers = [n.strip().lower() for n in data.Influencers.tolist()]
 
