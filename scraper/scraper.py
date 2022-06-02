@@ -5,7 +5,8 @@ import os.path
 import time
 
 import tweepy as tw
-import pandas as pd 
+import pandas as pd
+from github import Github
 
 
 # from pprint import pprint
