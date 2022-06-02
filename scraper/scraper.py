@@ -161,6 +161,17 @@ def save_results(RESULTS):
     df = pd.DataFrame(RESULTS)
 
     ### remove duplicates
+    # open github api connection
+    g = Github(USERNAME, TOKEN)
+    user = g.get_user(USERNAME)
+    repo = user.get_repo('SWB-GVCEH')
+    
+    # upload to github
+    filename = f"GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
+    df_csv = df.to_csv()
+    git_file = f'scraper/data/{filename}'
+    repo.create_file(git_file, "committing new file", df_csv, branch="main")
+    print('Done!!!')
 
 #     ### write to csv
 #     filename = f"data/GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
@@ -172,18 +183,6 @@ def save_results(RESULTS):
 
 #     print(df.head(10))
 #     print(df.shape)
-
-     # open github api connection
-     g = Github(USERNAME, TOKEN)
-     user = g.get_user(USERNAME)
-     repo = user.get_repo('SWB-GVCEH')
-     
-     # upload to github
-     filename = f"GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
-     df_csv = df.to_csv()
-     git_file = f'scraper/data/{filename}'
-     repo.create_file(git_file, "committing new file", df_csv, branch="main")
-     print('Done!!!')
 
 def load_keywords():
     """
