@@ -6,12 +6,17 @@ import pandas as pd
 print("executing cleaner.py")
 
 ### import the latest file 
-list_of_files = glob.glob('./scraper/data/*.csv') # * means all if need specific format then *.csv
-latest_file = max(list_of_files, key=os.path.getctime)
-print(f"latest file: {latest_file}")
+# list_of_files = glob.glob('./scraper/data/*.csv') # * means all if need specific format then *.csv
+# latest_file = max(list_of_files, key=os.path.getctime)
+
+# Read from github
+latest_file = f"GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
+with open(f'./scraper/data/{latest_file}', 'r') as file:
+    df = pd.read_csv(file)
 
 ### convert to pandas?
-df = pd.read_csv(latest_file)
+# df = pd.read_csv(latest_file)
+print(latest_file)
 print(f"Original file: {len(df)} tweets")
 
 ### remove duplicates
