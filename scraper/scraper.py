@@ -171,6 +171,7 @@ def save_results(RESULTS):
     filename = f"GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
     df_csv = df.to_csv()
     git_file = f'scraper/data/{filename}'
+    print(git_file)
     repo.create_file(git_file, "committing new file", df_csv, branch="main")
     print('Done with scraper.py!!!')
 
