@@ -29,20 +29,25 @@ repo = user.get_repo('SWB-GVCEH')
 my_repo = g.get_repo(repo.full_name)
 
 
-contents = my_repo.get_contents("")
-all_files = []
-while contents:
-    file_content = contents.pop(0)
-    if file_content.type == "dir":
-        contents.extend(repo.get_contents(file_content.path))
-    else:
-        file = file_content
-        all_files.append(str(file).replace('ContentFile(path="','').replace('")',''))
+# contents = my_repo.get_contents("")
+# all_files = []
+# while contents:
+#     file_content = contents.pop(0)
+#     if file_content.type == "dir":
+#         contents.extend(repo.get_contents(file_content.path))
+#     else:
+#         file = file_content
+#         all_files.append(str(file).replace('ContentFile(path="','').replace('")',''))
+
+# # Read from github
+# with open('./scraper/data/GVCEH-2022-05-17-tweet-raw.csv', 'r') as file:
+#     df = pd.read_csv(file)
+#     # print(df.info())
 
 # Read from github
-with open('./scraper/data/GVCEH-2022-05-17-tweet-raw.csv', 'r') as file:
+latest_file = f"GVCEH-{str(datetime.date.today())}-tweet-cleaned.csv"
+with open(f'./post-scraper/data/{latest_file}', 'r') as file:
     df = pd.read_csv(file)
-    # print(df.info())
 
 all_res = []
 for res in model(df.text.to_list(), batch_size=32, truncation=True):
@@ -57,7 +62,22 @@ df.head()
 
 stuff = df.to_csv()
 
+# # upload to github
+# git_file = 'modeling/data/GVCEH-2022-05-17-tweet-scored.csv'
+# repo.create_file(git_file, "committing new file", stuff, branch="main")
+# print('Done!!!')
+
+USERNAME = os.environ["USERNAME"] # for github api
+TOKEN = os.environ["TOKEN"] # for github api
+
+g = Github(USERNAME, TOKEN)
+user = g.get_user(USERNAME)
+repo = user.get_repo('SWB-GVCEH')
+    
 # upload to github
-git_file = 'modeling/data/GVCEH-2022-05-17-tweet-scored.csv'
-repo.create_file(git_file, "committing new file", stuff, branch="main")
-print('Done!!!')
+filename = f"GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
+df_csv = df.to_csv()
+git_file = f'modeling/data/{filename}'
+repo.create_file(git_file, "committing new file", df_csv, branch="main")
+print("Done Scoring!")
+
