@@ -30,7 +30,8 @@ for bad in bad_words:
 out_file = os.path.basename(latest_file).replace("raw", "cleaned")
 filename = f"data/{out_file}"
 
+print(out_file)
 df.to_csv(filename, encoding='utf-8', index=False)
 
 print(f"Cleaned file: {len(df)} tweets")
-print("Done Cleaning")
+print("Done Cleaning")   
