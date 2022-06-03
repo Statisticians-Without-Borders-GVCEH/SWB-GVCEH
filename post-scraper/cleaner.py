@@ -1,4 +1,5 @@
 import datetime
+import time
 import glob
 import os
 from github import Github
@@ -58,7 +59,11 @@ git_file = f'post-scraper/data/{filename}'
 repo.create_file(git_file, "committing new file", df_csv, branch="main")
 print("Done Cleaning");  
 
-# # Testing if upload is complete
-# with open(f'./post-scraper/data/{filename}', 'r') as file:
-#     df = pd.read_csv(file)
-#     print(df)
+while not os.path.exists(f'./post-scraper/data/{filename}'):
+    time.sleep(5)
+    print("sleeping")
+    
+# Testing if upload is complete
+with open(f'./post-scraper/data/{filename}', 'r') as file:
+    df = pd.read_csv(file)
+    print(df)
