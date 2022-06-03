@@ -4,7 +4,7 @@ import os
 import pandas as pd
 
 ### import the latest file 
-list_of_files = glob.glob('../scraper/data/*.csv') # * means all if need specific format then *.csv
+list_of_files = glob.glob('./scraper/data/*.csv') # * means all if need specific format then *.csv
 latest_file = max(list_of_files, key=os.path.getctime)
 
 ### convert to pandas?
