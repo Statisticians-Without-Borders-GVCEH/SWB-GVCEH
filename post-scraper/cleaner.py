@@ -12,7 +12,7 @@ print("executing cleaner.py")
 
 # Read from github
 latest_file = f"GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
-with open(f'./scraper/data/{latest_file}', 'r') as file:
+with open(f'scraper/data/{latest_file}', 'r') as file:
     df = pd.read_csv(file)
 
 ### convert to pandas?
