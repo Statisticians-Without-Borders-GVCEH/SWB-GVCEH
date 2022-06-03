@@ -32,12 +32,29 @@ for bad in bad_words:
 ### fancy NLP stuff here?
 
 
-### write out here#
-out_file = os.path.basename(latest_file).replace("raw", "cleaned")
-filename = f"data/{out_file}"
+# ### write out here#
+# out_file = os.path.basename(latest_file).replace("raw", "cleaned")
+# filename = f"data/{out_file}"
 
-print(out_file)
-df.to_csv(filename, encoding='utf-8', index=False)
+# print(out_file)
+# df.to_csv(filename, encoding='utf-8', index=False)
 
-print(f"Cleaned file: {len(df)} tweets")
-print("Done Cleaning")   
+# print(f"Cleaned file: {len(df)} tweets")
+# print("Done Cleaning")  
+
+# open github api connection
+USERNAME = os.environ["USERNAME"] # for github api
+TOKEN = os.environ["TOKEN"] # for github api
+
+g = Github(USERNAME, TOKEN)
+user = g.get_user(USERNAME)
+repo = user.get_repo('SWB-GVCEH')
+    
+# upload to github
+filename = f"GVCEH-{str(datetime.date.today())}-tweet-cleaned.csv"
+df_csv = df.to_csv()
+git_file = f'post-scraper/data/{filename}'
+repo.create_file(git_file, "committing new file", df_csv, branch="main")
+print("Done Cleaning") 
+
+print('Done!!!')
