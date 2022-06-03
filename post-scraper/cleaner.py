@@ -58,7 +58,7 @@ git_file = f'post-scraper/data/{filename}'
 repo.create_file(git_file, "committing new file", df_csv, branch="main")
 print("Done Cleaning");  
 
-# Testing if upload is complete
-with open(f'./post-scraper/data/{filename}', 'r') as file:
-    df = pd.read_csv(file)
-    print(df)
+# # Testing if upload is complete
+# with open(f'./post-scraper/data/{filename}', 'r') as file:
+#     df = pd.read_csv(file)
+#     print(df)
