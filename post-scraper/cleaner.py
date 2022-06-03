@@ -56,7 +56,7 @@ filename = f"GVCEH-{str(datetime.date.today())}-tweet-cleaned.csv"
 df_csv = df.to_csv()
 git_file = f'post-scraper/data/{filename}'
 repo.create_file(git_file, "committing new file", df_csv, branch="main")
-print("Done Cleaning") 
+print("Done Cleaning");  
 
 # Testing if upload is complete
 with open(f'./post-scraper/data/{filename}', 'r') as file:
