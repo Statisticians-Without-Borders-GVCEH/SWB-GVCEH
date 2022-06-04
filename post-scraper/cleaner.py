@@ -7,10 +7,6 @@ import pandas as pd
 
 print("executing cleaner.py")
 
-### import the latest file 
-# list_of_files = glob.glob('./scraper/data/*.csv') # * means all if need specific format then *.csv
-# latest_file = max(list_of_files, key=os.path.getctime)
-
 # open github api connection
 USERNAME = os.environ["USERNAME"] # for github api
 TOKEN = os.environ["TOKEN"] # for github api
@@ -32,8 +28,12 @@ while contents:
 for i in all_files:
     print(i)
     
-    
-    
+### import the latest file 
+list_of_files = glob.glob('./scraper/data/*.csv') # * means all if need specific format then *.csv
+latest_file = max(list_of_files, key=os.path.getctime)    
+print("method a")
+print(latest_file)
+
 # # Read from github
 latest_file = f"GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
 with open(f'scraper/data/{latest_file}', 'r') as file:
