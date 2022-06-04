@@ -55,13 +55,13 @@ repo = user.get_repo('SWB-GVCEH')
 # upload to github
 filename = f"GVCEH-{str(datetime.date.today())}-tweet-cleaned.csv"
 df_csv = df.to_csv()
-git_file = f'post-scraper/data/{filename}'
+git_file = f'/post-scraper/data/{filename}'
 repo.create_file(git_file, "committing new file", df_csv, branch="main")
 print("Done Cleaning");  
 
-while not os.path.exists(f'./post-scraper/data/{filename}'):
-    time.sleep(5)
-    print("sleeping")
+# while not os.path.exists(f'./post-scraper/data/{filename}'):
+#     time.sleep(5)
+#     print("sleeping")
     
 # Testing if upload is complete
 with open(f'./post-scraper/data/{filename}', 'r') as file:
