@@ -9,7 +9,7 @@ print("executing cleaner.py")
 
 # open github api connection
 USERNAME = os.environ["USERNAME"] # for github api
-TOKEN = os.environ["TOKEN"] # for github api
+TOKEN = os.environ["TOKEN"]; # for github api
 
 g = Github(USERNAME, TOKEN)
 user = g.get_user(USERNAME)
@@ -26,19 +26,19 @@ while contents:
         all_files.append(str(file).replace('ContentFile(path="','').replace('")',''))
         
 for i in all_files:
-    print(i)
+    print(i);
     
 ### import the latest file 
 list_of_files = glob.glob('./scraper/data/*.csv') # * means all if need specific format then *.csv
 latest_file = max(list_of_files, key=os.path.getctime)    
 print("method a")
-print(latest_file)
+print(latest_file);
 
 # # Read from github
 latest_file = f"GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
 with open(f'scraper/data/{latest_file}', 'r') as file:
 # with open('./scraper/data/GVCEH-2022-06-03-tweet-raw.csv', 'r') as file:
-    df = pd.read_csv(file)
+    df = pd.read_csv(file);
 
 ### convert to pandas?
 # df = pd.read_csv(latest_file)
