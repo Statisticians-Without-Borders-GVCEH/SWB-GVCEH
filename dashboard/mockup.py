@@ -32,7 +32,7 @@ hide_table_row_index = """
 # Inject CSS with Markdown
 st.markdown(hide_table_row_index, unsafe_allow_html=True)
 
-# import data
+# import twitter
 dsource_dict = gvceh.get_data() # replace with get_seed
 inf = gvceh.get_seed() # remove
 
@@ -43,7 +43,7 @@ readme = gvceh.tooltips()
 with sidebar:
 
 	st.sidebar.header('1. Data')
-	option = st.sidebar.selectbox('Select a data source', 
+	option = st.sidebar.selectbox('Select a twitter source',
 		('Twitter', 'Reddit'),
 		key='saanich', help=readme['saanich'])
 
@@ -105,9 +105,9 @@ with header:
 	st.write(current_df.head())
 
 	st.download_button(
-     label="Download data as CSV",
+     label="Download twitter as CSV",
      data=use_df.to_csv().encode('utf-8'),
-     file_name='data.csv')
+     file_name='twitter.csv')
 
 	# st.write(wt_try)
 	st.subheader('Tweets Per Day')
@@ -195,7 +195,7 @@ with aggregations:
 
 
 		if (len(locations_selected) > 0 or agg_option == 'Capital Region District (All)'):
-			# Need more data to determine how useful this will be
+			# Need more twitter to determine how useful this will be
 			conditions = [
 				(current_df['sentiment'] == "Neutral"),
 				(current_df['sentiment'] == "Negative"),
@@ -242,7 +242,7 @@ with aggregations:
 		# 		layers=[
 		# 			pdk.Layer(
 		# 				'HexagonLayer',
-		# 				data=real_data,
+		# 				twitter=real_data,
 		# 				get_position='[Longitude, Latitude]',
 		# 				auto_highlight=True,
 		# 				elevation_scale=4,
