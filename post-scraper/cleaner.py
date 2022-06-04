@@ -11,6 +11,29 @@ print("executing cleaner.py")
 # list_of_files = glob.glob('./scraper/data/*.csv') # * means all if need specific format then *.csv
 # latest_file = max(list_of_files, key=os.path.getctime)
 
+# open github api connection
+USERNAME = os.environ["USERNAME"] # for github api
+TOKEN = os.environ["TOKEN"] # for github api
+
+g = Github(USERNAME, TOKEN)
+user = g.get_user(USERNAME)
+repo = user.get_repo('SWB-GVCEH')
+my_repo = g.get_repo(repo.full_name)
+contents = my_repo.get_contents("")
+all_files = []
+while contents:
+    file_content = contents.pop(0)
+    if file_content.type == "dir":
+        contents.extend(repo.get_contents(file_content.path))
+    else:
+        file = file_content
+        all_files.append(str(file).replace('ContentFile(path="','').replace('")',''))
+        
+for i in all_files:
+    print(i)
+    
+    
+    
 # # Read from github
 latest_file = f"GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
 with open(f'scraper/data/{latest_file}', 'r') as file:
