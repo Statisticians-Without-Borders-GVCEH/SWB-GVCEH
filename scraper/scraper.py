@@ -174,7 +174,7 @@ def save_results(RESULTS):
     repo = user.get_repo('SWB-GVCEH')
 
     # upload to github
-    filename = f"GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
+    filename = f"GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
     df_csv = df.to_csv()
     git_file = f'data/processed/twitter/{filename}'
     print(git_file)
@@ -438,7 +438,7 @@ if __name__ == "__main__":
     ### TODO: command line blow out delete
 
     ### gen_queries
-    # gen_queries()
+    gen_queries()
 
     ### batch scrape
-    batch_scrape()
+    # batch_scrape()
