@@ -5,12 +5,12 @@ import numpy as np
 
 def get_seed():
 	''' Input the influencer file and add a boolean influencer column to the dataframes.
-	Specify the data source in src.'''
+	Specify the twitter source in src.'''
 
-	reddit_df = pd.read_csv('./data/demo/reddit_antiwork.csv', 
+	reddit_df = pd.read_csv('./data/processed/reddit_antiwork.csv',
 		parse_dates=['timestamp'], dtype={'created': object, 'score': float})
 
-	twitter_df = pd.read_csv('./data/demo/GVCEH-2022-04-11-tweet-raw-sentiment.csv',
+	twitter_df = pd.read_csv('./data/processed/GVCEH-2022-04-11-tweet-raw-sentiment.csv',
     	parse_dates=['created_at'], dtype={'tweet_id': object})
 
 	# next two lines should be part of post scrape clean-up
@@ -26,10 +26,10 @@ def get_data():
 
     twitter_df, reddit_df = get_seed()
 
-    # reddit_df = pd.read_csv('./data/demo/reddit_antiwork.csv',
+    # reddit_df = pd.read_csv('./twitter/demo/reddit_antiwork.csv',
     #  parse_dates=['timestamp'], dtype={'created': object, 'score': float})
 
-    # twitter_df = pd.read_csv('./data/demo/GVCEH-2022-04-11-tweet-raw-sentiment.csv', 
+    # twitter_df = pd.read_csv('./twitter/demo/GVCEH-2022-04-11-tweet-raw-sentiment.csv',
     # 	parse_dates=['created_at'], dtype={'tweet_id': object})
 
     return {'Twitter': twitter_df, 'Reddit': reddit_df}
@@ -39,8 +39,7 @@ def tooltips():
     ''' A dictionary of tooltips.'''
     readme = {}
     readme['saanich'] = 'Would you like to see an analysis for Twitter or Reddit?'
-    readme[
-        'langford'] = 'Would you like to see a prior period comparison? This depends on the date range selected i.e. a prior period comparison for 4/10/22 - 4/16/22 would be 4/3/22 - 4/9/22.'
+    readme['langford'] = 'Would you like to see a prior period comparison? This depends on the date range selected i.e. a prior period comparison for 4/10/22 - 4/16/22 would be 4/3/22 - 4/9/22.'
 
     return readme
 
@@ -140,15 +139,16 @@ def top_influencers(cdf):
 
 
 def get_appendix_a_locations():
-    return(pd.read_csv('./data/appendices/aa.csv'))
+    df = pd.read_csv('./appendices/aa.csv')
+    return(df)
 
 def get_lat_long(left_df):
-    right_df = pd.read_csv('./data/demo/Geolocation_Mapping - Sheet1.csv')
+    right_df = pd.read_csv('./twitter/demo/Geolocation_Mapping - Sheet1.csv')
     return left_df.merge(right_df, left_on='search_neighbourhood',
                          right_on='Appendix A Location', how='inner')
 
 def get_locations(agg_option):
-    df = pd.read_csv('./data/appendices/aa.csv')
+    df = pd.read_csv('./appendices/aa.csv')
     return df.loc[df["Category"] == agg_option, "Location"].tolist()
 
 # def agg_tweets_by_users(cdf, pdf):
