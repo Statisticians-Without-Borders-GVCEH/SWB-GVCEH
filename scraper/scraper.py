@@ -3,52 +3,52 @@ import os
 import pickle
 import os.path
 import time
-import model #gvceh functions
-import cleaner #gvceh functions
+import model  # gvceh functions
+import cleaner  # gvceh functions
 import tweepy as tw
 import pandas as pd
-from github import Github
-from transformers import pipeline
 
-# from pprint import pprint
-# from dotenv import load_dotenv
-#
-# load_dotenv() # imprt out enviroment variables
-#
-# API_KEY = os.environ.get("API_KEY") # consumer
-# API_SECRET_KEY = os.environ.get("API_SECRET_KEY") # consumer
-# BEARER_TOKEN = os.environ.get("BEARER_TOKEN")
-#
-# ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
-# ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
-#
-# USERNAME = os.environ.get("USERNAME")  # for github api
-# TOKEN = os.environ.get("TOKEN")  # for github api
+# from github import Github
+# from transformers import pipeline
 
+from pprint import pprint
+from dotenv import load_dotenv
+
+load_dotenv()  # imprt out enviroment variables
+
+API_KEY = os.environ.get("API_KEY")  # consumer
+API_SECRET_KEY = os.environ.get("API_SECRET_KEY")  # consumer
+BEARER_TOKEN = os.environ.get("BEARER_TOKEN")
+
+ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
+ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
+
+USERNAME = os.environ.get("USERNAME")  # for github api
+TOKEN = os.environ.get("TOKEN")  # for github api
 
 
 # load environment variables using secret tokens
-API_KEY = os.environ["API_KEY"]
+"""API_KEY = os.environ["API_KEY"]
 API_SECRET_KEY = os.environ["API_SECRET_KEY"]
 BEARER_TOKEN = os.environ["BEARER_TOKEN"]
 ACCESS_TOKEN = os.environ["ACCESS_TOKEN"]
 ACCESS_TOKEN_SECRET = os.environ["ACCESS_TOKEN_SECRET"]
 
 USERNAME = os.environ["USERNAME"]  # for github api
-TOKEN = os.environ["TOKEN"]  # for github api
+TOKEN = os.environ["TOKEN"]  # for github api"""
 
 ### setting up the config
 MAX_TWEETS = 100
 TESTING = False
 
 MAX_PER_15 = 9999  ### TODO: Find this limit
-QUERY_START_AT = 0
+QUERY_START_AT = 450  # 0
 
 QUERY_MAX_LENGTH = 512
 SUB_QUERY_CHUNKS = 10  ### how many queries we split Appendix C + E + D into
 NUM_ACCOUNTS_TO_TARGET = 5  ### How many queries we split Appendix B into
 NEIGHBOURHOOD_CHUNKS = 10  ### split neighbourhood into how many chunks ?
-QUERY_CACHE_FILE = "./scraper/querylist.pkl"
+QUERY_CACHE_FILE = "querylist.pkl"
 
 client = tw.Client(bearer_token=BEARER_TOKEN)
 
@@ -58,17 +58,19 @@ client = tw.Client(bearer_token=BEARER_TOKEN)
 # https://datascienceparichay.com/article/python-get-data-from-twitter-api-v2/
 # tweepy / api v2 info
 
+
 def query_twitter(TW_QUERY, RELEVANT_REGION):
     """
-        Run one query against the API and store it
+    Run one query against the API and store it
     """
 
     return_data = []
-    search_query = TW_QUERY.replace(' and ', ' "and" ')
+    search_query = TW_QUERY.replace(" and ", ' "and" ')
 
     # print("="*40)
     # print(f"Searching for... {search_query}")
     print("Searching...")
+    print(TW_QUERY)
 
     # get tweets
     ### limits us last 7 days, need elevated account for longer than that
@@ -76,11 +78,25 @@ def query_twitter(TW_QUERY, RELEVANT_REGION):
         query=search_query,
         # start_time=start_time,
         # end_time=end_time,
-        tweet_fields=["context_annotations", "public_metrics", "created_at", "text", "source", "geo"],
-        user_fields=["name", "username", "location", "verified", "description", "public_metrics"],
+        tweet_fields=[
+            "context_annotations",
+            "public_metrics",
+            "created_at",
+            "text",
+            "source",
+            "geo",
+        ],
+        user_fields=[
+            "name",
+            "username",
+            "location",
+            "verified",
+            "description",
+            "public_metrics",
+        ],
         max_results=MAX_TWEETS,
-        place_fields=['country', 'geo', 'name', 'place_type'],
-        expansions=['author_id', 'geo.place_id']
+        place_fields=["country", "geo", "name", "place_type"],
+        expansions=["author_id", "geo.place_id"],
     )
 
     ### not yielding anything? exit early
@@ -89,71 +105,76 @@ def query_twitter(TW_QUERY, RELEVANT_REGION):
         return []
 
     ### generate our place information
-    if 'places' in tweets.includes.keys():
+    if "places" in tweets.includes.keys():
         place_info = {
             place.id: {
-                'bbox': place.geo['bbox'],  # geoJSON, min long, min lat, max long, max lat
-                'full_name': place.full_name,
+                "bbox": place.geo[
+                    "bbox"
+                ],  # geoJSON, min long, min lat, max long, max lat
+                "full_name": place.full_name,
                 # place.name
                 # place.place_type
                 # place.full_name
                 # place.country
-            } for place in tweets.includes['places']
+            }
+            for place in tweets.includes["places"]
         }
 
         ### generate our twitter twitter
-    for tweet, user in zip(tweets.data, tweets.includes['users']):
+    for tweet, user in zip(tweets.data, tweets.includes["users"]):
 
         newtweet = {}
 
         # original text
-        newtweet['text'] = tweet.text
+        newtweet["text"] = tweet.text
 
         ### scrape time
-        newtweet['scrape_time'] = str(datetime.datetime.now())
+        newtweet["scrape_time"] = str(datetime.datetime.now())
 
         ### unique ID
-        newtweet['tweet_id'] = tweet.id
+        newtweet["tweet_id"] = tweet.id
 
         # post time
-        newtweet['created_at'] = str(tweet.created_at)
+        newtweet["created_at"] = str(tweet.created_at)
 
         # reply count
-        newtweet['reply_count'] = tweet.public_metrics['reply_count']
+        newtweet["reply_count"] = tweet.public_metrics["reply_count"]
         # number of quote tweets
-        newtweet['quote_count'] = tweet.public_metrics['quote_count']
+        newtweet["quote_count"] = tweet.public_metrics["quote_count"]
         # number of likes
-        newtweet['like_count'] = tweet.public_metrics['like_count']
+        newtweet["like_count"] = tweet.public_metrics["like_count"]
         # number of RTs
-        newtweet['retweet_count'] = tweet.public_metrics['retweet_count']
+        newtweet["retweet_count"] = tweet.public_metrics["retweet_count"]
 
         ### geo twitter (where available)
-        newtweet['geo_full_name'] = None
-        newtweet['geo_id'] = None
-        newtweet['geo_bbox'] = None
+        newtweet["geo_full_name"] = None
+        newtweet["geo_id"] = None
+        newtweet["geo_bbox"] = None
 
         if tweet.geo:
-            newtweet['geo_id'] = tweet.geo['place_id']
-            newtweet['geo_full_name'] = place_info[tweet.geo['place_id']]['full_name']
-            newtweet['geo_bbox'] = place_info[tweet.geo['place_id']]['bbox']
+            newtweet["geo_id"] = tweet.geo["place_id"]
+            newtweet["geo_full_name"] = place_info[tweet.geo["place_id"]]["full_name"]
+            newtweet["geo_bbox"] = place_info[tweet.geo["place_id"]]["bbox"]
 
         ### cordinate twitter - where available
-        newtweet['tweet_coordinate'] = ''
+        newtweet["tweet_coordinate"] = ""
         if tweet.geo:
-            if tweet.geo.get('coordinates', None):
-                newtweet['tweet_coordinate'] = tweet.geo.get('coordinates').get('coordinates')
+            if tweet.geo.get("coordinates", None):
+                newtweet["tweet_coordinate"] = tweet.geo.get("coordinates").get(
+                    "coordinates"
+                )
 
         # poster
-        newtweet['username'] = user.username
+        newtweet["username"] = user.username
 
         # number of followers
-        newtweet['num_followers'] = user.public_metrics['followers_count']
+        newtweet["num_followers"] = user.public_metrics["followers_count"]
 
         ### so we know how it was found
-        newtweet['search_keywords'] = search_query
+        newtweet["search_keywords"] = search_query
 
         ### more meta twitter
-        newtweet['search_neighbourhood'] = RELEVANT_REGION
+        newtweet["search_neighbourhood"] = RELEVANT_REGION
 
         return_data.append(newtweet)
 
@@ -165,63 +186,60 @@ def save_results(RESULTS):
 
     ### create pandas df of all twitter
     df = pd.DataFrame(RESULTS)
-    df = model.sentiment_model(df) # adding model scores
-    df = cleaner.clean_tweets(df) # post-scraping cleaner
 
-    # open github api connection
-    g = Github(USERNAME, TOKEN)
-    user = g.get_user(USERNAME)
-    repo = user.get_repo('SWB-GVCEH')
+    # df = model.sentiment_model(df)  # adding model scores
+    # df = cleaner.clean_tweets(df)  # post-scraping cleaner
 
-    # upload to github
-    filename = f"GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
-    df_csv = df.to_csv()
-    git_file = f'data/processed/twitter/{filename}'
-    print(git_file)
-    repo.create_file(git_file, "committing new file", df_csv, branch="main")
-    print('Done with scraper.py!!!')
+    # # open github api connection
+    # g = Github(USERNAME, TOKEN)
+    # user = g.get_user(USERNAME)
+    # repo = user.get_repo("SWB-GVCEH")
 
+    # # upload to github
+    # filename = f"GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
+    # df_csv = df.to_csv()
+    # git_file = f"data/processed/twitter/{filename}"
+    # print(git_file)
+    # repo.create_file(git_file, "committing new file", df_csv, branch="main")
+    # print("Done with scraper.py!!!")
 
-#     ### write to csv
-#     filename = f"twitter/GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
+    ### write to csv
+    filename = f"../data/post-scraper/GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
 
-#     if os.path.isfile(filename):
-#         df.to_csv(filename, encoding='utf-8', mode='a', header=False, index=False)
-#     else:
-#         df.to_csv(filename, encoding='utf-8', index=False)
+    if os.path.isfile(filename):
+        df.to_csv(filename, encoding="utf-8", mode="a", header=False, index=False)
+    else:
+        df.to_csv(filename, encoding="utf-8", index=False)
 
-#     print(df.head(10))
-#     print(df.shape)
+    print(df.head(10))
+    print(df.shape)
+
 
 def load_keywords():
     """
-        Loads our appendices into a dict of lists:
-        returns: {
-            'ac': [],
-            'ad': [],
-            'ae': []
-        }
+    Loads our appendices into a dict of lists:
+    returns: {
+        'ac': [],
+        'ad': [],
+        'ae': []
+    }
     """
-    data = pd.read_csv('./appendices/ac.csv', index_col=0)
+    data = pd.read_csv("../appendices/ac.csv", index_col=0)
     kw1 = [k.strip().lower() for k in data.Organizations.tolist()]
 
-    data = pd.read_csv('./appendices/ad.csv', index_col=0)
+    data = pd.read_csv("../appendices/ad.csv", index_col=0)
     kw2 = [k.strip().lower() for k in data.sectors.tolist()]
 
-    data = pd.read_csv('./appendices/ae.csv', index_col=0)
+    data = pd.read_csv("../appendices/ae.csv", index_col=0)
     kw3 = [k.strip().lower() for k in data.word.tolist()]
 
-    return {
-        'ac': kw1,
-        'ad': kw2,
-        'ae': kw3
-    }
+    return {"ac": kw1, "ad": kw2, "ae": kw3}
 
 
 def prep_subq(KEYWORDS_DICT, CHUNKS):
     """
-        Generates the list of strings
-        Each string is the keyword subquery
+    Generates the list of strings
+    Each string is the keyword subquery
     """
     ### make one list of keywords
     if type(KEYWORDS_DICT) is not list:
@@ -243,11 +261,11 @@ def prep_subq(KEYWORDS_DICT, CHUNKS):
 
 def gen_query_one(SUB_QUERY):
     """
-        Generates a list of queries containing neighbourhood x keyword products
+    Generates a list of queries containing neighbourhood x keyword products
     """
 
     ### get our neighbourhoods
-    data = pd.read_csv('./appendices/aa_old.csv', index_col=0)
+    data = pd.read_csv("../appendices/aa_old.csv", index_col=0)
 
     neighbourhoods = [n.strip().lower() for n in data.Location.tolist()]
 
@@ -273,14 +291,20 @@ def gen_query_one(SUB_QUERY):
 
 def gen_query_two(SUB_QUERY):
     """
-        Generate list of CRD identifies x keywords
+    Generate list of CRD identifies x keywords
     """
 
     ### our CRD level keywords
     neighbourhoods = [
-        'Greater Victoria', '#GreaterVictoria', 'Victoria', 'VictoriaBC',
-        'Victoria B.C.', '#YYJ', 'YYJ', '#GVCEH',
-        'Greater Victoria Coalition to End Homelessness'
+        "Greater Victoria",
+        "#GreaterVictoria",
+        "Victoria",
+        "VictoriaBC",
+        "Victoria B.C.",
+        "#YYJ",
+        "YYJ",
+        "#GVCEH",
+        "Greater Victoria Coalition to End Homelessness",
     ]
 
     ### now to make our queries with the neighbourhoods
@@ -301,20 +325,20 @@ def gen_query_two(SUB_QUERY):
 
 
 def chunker(seq, size):
-    return (seq[pos:pos + size] for pos in range(0, len(seq), size))
+    return (seq[pos : pos + size] for pos in range(0, len(seq), size))
 
 
 def gen_query_three(SUB_QUERY):
     """
-        Check specific twitter accounts for tweets
+    Check specific twitter accounts for tweets
     """
 
     ### load the names from the appendix
-    data = pd.read_csv('./appendices/aborganizations.csv', index_col=0)
+    data = pd.read_csv("../appendices/aborganizations.csv", index_col=0)
 
     orgs = [n.strip().lower() for n in data.Organizations.tolist()]
 
-    data = pd.read_csv('./appendices/abpersons.csv', index_col=0)
+    data = pd.read_csv("../appendices/abpersons.csv", index_col=0)
 
     pers = [n.strip().lower() for n in data.Influencers.tolist()]
 
@@ -336,7 +360,7 @@ def gen_query_three(SUB_QUERY):
                 print("CHUNK KEYWORD UNION SMALLER")
                 print(querytext)
                 print(len(querytext))
-            query.append((querytext, 'individual'))
+            query.append((querytext, "individual"))
 
     return query
 
@@ -372,14 +396,14 @@ def gen_queries():
 
     # cache queries
     print("Writing...")
-    with open(QUERY_CACHE_FILE, 'wb') as f:
+    with open(QUERY_CACHE_FILE, "wb") as f:
         pickle.dump(queries, f)
 
 
 def batch_scrape():
     ### open our pickle cache of queries
     # https://stackoverflow.com/questions/25464295/dump-a-list-in-a-pickle-file-and-retrieve-it-back-later
-    with open(QUERY_CACHE_FILE, 'rb') as f:
+    with open(QUERY_CACHE_FILE, "rb") as f:
         query_cache = pickle.load(f)
 
     ### manage the pickle json twitter for state status
@@ -417,7 +441,8 @@ def batch_scrape():
             num_results += len(data)
 
             ### scave our twitter - only if we got any
-            if data: save_results(data)
+            if data:
+                save_results(data)
 
         except Exception as e:
 
@@ -438,7 +463,7 @@ if __name__ == "__main__":
     ### TODO: command line blow out delete
 
     ### gen_queries
-    gen_queries()
+    # gen_queries()
 
     ### batch scrape
-    # batch_scrape()
+    batch_scrape()
