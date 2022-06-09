@@ -42,7 +42,7 @@ MAX_TWEETS = 100
 TESTING = False
 
 MAX_PER_15 = 9999  ### TODO: Find this limit
-QUERY_START_AT = 450  # 0
+QUERY_START_AT = 0
 
 QUERY_MAX_LENGTH = 512
 SUB_QUERY_CHUNKS = 10  ### how many queries we split Appendix C + E + D into
@@ -67,10 +67,10 @@ def query_twitter(TW_QUERY, RELEVANT_REGION):
     return_data = []
     search_query = TW_QUERY.replace(" and ", ' "and" ')
 
-    # print("="*40)
-    # print(f"Searching for... {search_query}")
-    print("Searching...")
-    print(TW_QUERY)
+    print("=" * 40)
+    print(f"Searching for... {search_query}")
+    # print("Searching...")
+    # print(TW_QUERY)
 
     # get tweets
     ### limits us last 7 days, need elevated account for longer than that
