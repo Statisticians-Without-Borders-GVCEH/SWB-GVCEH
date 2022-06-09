@@ -16,6 +16,7 @@ def clean_tweets(df):
 
     ### fancy NLP stuff here?
 
+    print(f"Cleaned file: {len(df)} tweets")
     return df
 
 
