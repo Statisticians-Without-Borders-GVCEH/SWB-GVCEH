@@ -15,6 +15,8 @@ from PIL import Image
 # test_df = sharep.get_data_sharepoint()
 # print(test_df.head())
 
+st.set_page_config(layout="wide")
+
 # init streamlit containers
 header = st.container()
 aggregations = st.container()
@@ -77,14 +79,16 @@ with sidebar:
 	list1 = ["Capital Region District (All)"]
 	agg_levels = list1 + list2
 
-
-
 	locations_selected = []
 	agg_option = st.sidebar.selectbox('Select an aggregation level:', agg_levels)
 	location_option = gvceh.get_locations(agg_option)
 	if location_option:
 		locations_selected = st.sidebar.multiselect('Select specific location(s):', location_option,
 													default=location_option)
+	
+	st.sidebar.header('4. Display Top Influencer Tweets')
+	displaytweets_flag = st.sidebar.checkbox('Display tweets by top influencers', value=False)
+
 
 # define variables based on user options
 use_df = dsource_dict[option]
@@ -94,84 +98,87 @@ image = Image.open('./dashboard/branding.png')
 
 # wt_try = gvceh.weighted_agg_sentiments_by_category(current_df, prior_df, 0.7)
 
+# additions to sidebar after user input
+st.sidebar.header('5. Download Data')
+st.sidebar.download_button(
+	label="Download data as CSV",
+	data=use_df.to_csv().encode('utf-8'),
+	file_name='twitter.csv')
+
 
 with header:
+	a1, a2 = st.columns([1,1.5])
 
-	st.image(image)
+	a1.title('Homelessness in Greater Victoria')
+	a1.markdown('''This dashboard gives a sense of the sentiment around homelessness in the Greater Victoria area.''')
 
-	st.title('Homelessness in Greater Victoria')
-	st.markdown('''This dashboard gives a sense of the sentiment around homelessness in the Greater Victoria area.''')
+	### get a better image after fixing the rest of the layout
+	a2.image(image)
 
-	st.write(current_df.head())
+	# whitespace
+	n = 0
+	while n < 4:
+		a1.write('')
+		n = n + 1
 
-	st.download_button(
-     label="Download twitter as CSV",
-     data=use_df.to_csv().encode('utf-8'),
-     file_name='twitter.csv')
 
-	# st.write(wt_try)
-	st.subheader('Tweets Per Day')
-
+	# 1. Graph of tweets per day historically
+	a1.subheader('Tweets Per Day')
 	tweets_per_day = use_df.groupby([use_df['created_at'].dt.date]).tweet_id.nunique()
 
 	fig_0 = px.line(tweets_per_day, x=tweets_per_day.index, y="tweet_id",
 		labels={"tweet_id":"Number of Tweets", "created_at":"Date"})
 	fig_0.update_traces(line_color='#BF4C41')
-	st.plotly_chart(fig_0)
+	a1.plotly_chart(fig_0, use_container_width=True)
 
+
+	# 2. Viewing a random sample of tweets for sentiment categories
+	a2.subheader('Sample of Tweets' if option == 'Twitter' else 'Sample of Posts')
+	choice = a2.selectbox('Choose a sentiment', 
+		['Negative', 'Neutral', 'Positive'])
+	a2.table((current_df.loc[current_df.sentiment == choice].sample(n=5))[['tweet_id', 'username', 'text']])
+
+	# st.write(wt_try)
+	
 with aggregations:
 
+	b1, b2 = st.columns(2)
+	
 	# @st.cache
 	if start_date > end_date:
 	    st.sidebar.error('Error: End date must be on or after the start date.')
 	else:
-		st.header(option)
+		# st.header(option)
 
-		# 1. Viewing a random sample of tweets for sentiment categories
-		st.subheader('Sample of Tweets' if option == 'Twitter' else 'Sample of Posts')
-		choice = st.selectbox('Choose a sentiment', 
-			['Negative', 'Neutral', 'Positive'])
-		st.table((current_df.loc[current_df.sentiment == choice].sample(n=5))[['tweet_id', 'username', 'text']])
-
-		# 2. Sentiment Scores Aggregated by Category, with prior period comparison
-		st.subheader('Sentiment Scores')
+		# 3. Sentiment Scores Aggregated by Category, with prior period comparison
+		b1.subheader('Sentiment Scores')
 		if priorperiod_flag:
 			prior_start_date, prior_end_date = gvceh.get_prior_period(start_date, end_date)
-			st.write('Prior period is from', prior_start_date, 'to', prior_end_date)
+
+			with b1:
+				st.write('Prior period is from', prior_start_date, 'to', prior_end_date)
+
 			fig_1 = px.bar(sentiments_by_category, x='Sentiment', y=['Current', 'Prior'],
 				barmode='group', color_discrete_sequence=['#000080', '#8c9e5e']*3)
-			st.plotly_chart(fig_1)
+			b1.plotly_chart(fig_1)
 		else:
 			fig_2 = px.bar(sentiments_by_category, x='Sentiment', y='Current', color_discrete_sequence=['#000080']*3)
-			st.plotly_chart(fig_2)
-
-		# 3. Top Influencers
-		st.subheader('Top Influencers')
+			b1.plotly_chart(fig_2)
 		
-		display_tweets = st.checkbox('Display tweets by top influencers.')
 
+		# 4. Top Influencers
+		b2.subheader('Top Influencers')
+		
 		current_influencers = gvceh.top_influencers(current_df)
 		# st.table(current_influencers)
-		if display_tweets:
-			st.table(current_df.loc[current_df['username'].isin(current_influencers.iloc[0:5]['username'])][['username','text']])
+		if displaytweets_flag:
+			b2.table(current_df.loc[current_df['username'].isin(current_influencers.iloc[0:5]['username'])][['username','text']])
 
-		
-
-
-		# current_influencers = pd.DataFrame(current_df['username'].value_counts(sort=True).reset_index())
-		# st.write(current_influencers)
-		# current_influencers.columns = ['username', 'Number of Tweets']
-
-		# cnum = pd.DataFrame(current_df.groupby(['username']).max()['num_followers']).reset_index()
-		# current_influencers = current_influencers.merge(cnum, left_on='username',
-		# 	right_on='username', how='left')
-		# current_influencers.columns = ['Username', 'Number of Tweets', 'Number of Followers']
-
-		# st.table(current_influencers.iloc[0:5])
 		fig_3 = px.bar(current_influencers.iloc[0:5], x='username', y='score', color_discrete_sequence=['#000080'])
-		st.plotly_chart(fig_3)
+		b2.plotly_chart(fig_3)
 
-		# 4. Geolocations
+
+		# 5. Geolocations
 		st.subheader('Locations')
 		st.write('Sentiment by topic location')
 

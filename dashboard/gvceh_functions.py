@@ -10,7 +10,7 @@ def get_seed():
 	reddit_df = pd.read_csv('./data/processed/reddit_antiwork.csv',
 		parse_dates=['timestamp'], dtype={'created': object, 'score': float})
 
-	twitter_df = pd.read_csv('./data/processed/GVCEH-2022-04-11-tweet-raw-sentiment.csv',
+	twitter_df = pd.read_csv('./data/processed/demo/GVCEH-2022-04-11-tweet-raw-sentiment.csv',
     	parse_dates=['created_at'], dtype={'tweet_id': object})
 
 	# next two lines should be part of post scrape clean-up
