@@ -16,6 +16,12 @@ def clean_tweets(df):
 
     ### fancy NLP stuff here?
 
+
+    ### add the influencer flag here if data source is Twitter
+	# twitter_influencer_list = list(pd.read_csv('./dashboard/influencers.csv')['handle'])
+	# df['influencer_flag'] = df['username'].apply(lambda x: 1 if x in twitter_influencer_list else 0)
+
+
     print(f"Cleaned file: {len(df)} tweets")
     return df
 
