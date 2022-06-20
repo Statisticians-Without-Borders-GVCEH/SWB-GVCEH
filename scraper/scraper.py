@@ -42,7 +42,7 @@ MAX_TWEETS = 100
 TESTING = False
 
 MAX_PER_15 = 9999  ### TODO: Find this limit
-QUERY_START_AT = 450
+QUERY_START_AT = 0
 
 QUERY_MAX_LENGTH = 512
 SUB_QUERY_CHUNKS = 10  ### how many queries we split Appendix C + E + D into
