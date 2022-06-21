@@ -418,7 +418,9 @@ def batch_scrape():
 #         query_cache = pickle.load(f)
     f = repo.get_contents(QUERY_CACHE_FILE)
     print(f)
-    query_cache = pickle.load(f)
+    file_content = contents.pop(0)
+    print(file_content)
+    query_cache = pickle.load(file_content)
 
     ### manage the pickle json twitter for state status
     ### first day today?  yes or no
