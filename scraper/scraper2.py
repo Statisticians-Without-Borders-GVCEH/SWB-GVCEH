@@ -51,6 +51,13 @@ NUM_ACCOUNTS_TO_TARGET = 5  ### How many queries we split Appendix B into
 NEIGHBOURHOOD_CHUNKS = 10  ### split neighbourhood into how many chunks ?
 QUERY_CACHE_FILE = "querylist.pkl"
 
+# open github api connection
+g = Github(USERNAME, TOKEN)
+user = g.get_user(USERNAME)
+repo = user.get_repo("SWB-GVCEH")
+
+
+# twitter api 
 client = tw.Client(bearer_token=BEARER_TOKEN)
 
 
@@ -191,10 +198,10 @@ def save_results(RESULTS):
     df = model.sentiment_model(df)  # adding model scores
     df = cleaner.clean_tweets(df)  # post-scraping cleaner
 
-    # open github api connection
-    g = Github(USERNAME, TOKEN)
-    user = g.get_user(USERNAME)
-    repo = user.get_repo("SWB-GVCEH")
+#     # open github api connection
+#     g = Github(USERNAME, TOKEN)
+#     user = g.get_user(USERNAME)
+#     repo = user.get_repo("SWB-GVCEH")
 
     # upload to github
     filename = f"GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
@@ -399,8 +406,10 @@ def gen_queries():
 
     # cache queries
     print("Writing...")
-    with open(QUERY_CACHE_FILE, "wb") as f:
-        pickle.dump(queries, f)
+#     with open(QUERY_CACHE_FILE, "wb") as f:
+#         pickle.dump(queries, f)
+    f = repository.get_contents(QUERY_CACHE_FILE)
+    picle.dump(queries, f)
 
 
 def batch_scrape():
