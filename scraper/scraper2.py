@@ -406,17 +406,18 @@ def gen_queries():
 
     # cache queries
     print("Writing...")
-#     with open(QUERY_CACHE_FILE, "wb") as f:
-#         pickle.dump(queries, f)
-    f = repository.get_contents(QUERY_CACHE_FILE)
-    picle.dump(queries, f)
+    with open(QUERY_CACHE_FILE, "wb") as f:
+        pickle.dump(queries, f)
+
 
 
 def batch_scrape():
     ### open our pickle cache of queries
     # https://stackoverflow.com/questions/25464295/dump-a-list-in-a-pickle-file-and-retrieve-it-back-later
-    with open(QUERY_CACHE_FILE, "rb") as f:
-        query_cache = pickle.load(f)
+#     with open(QUERY_CACHE_FILE, "rb") as f:
+#         query_cache = pickle.load(f)
+    f = repository.get_contents(QUERY_CACHE_FILE)
+    picle.dump(queries, f)
 
     ### manage the pickle json twitter for state status
     ### first day today?  yes or no
