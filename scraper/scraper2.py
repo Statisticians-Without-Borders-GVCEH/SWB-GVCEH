@@ -7,6 +7,7 @@ import model  # gvceh functions
 import cleaner  # gvceh functions
 import tweepy as tw
 import pandas as pd
+import requests
 
 from github import Github
 from transformers import pipeline
@@ -416,11 +417,18 @@ def batch_scrape():
     # https://stackoverflow.com/questions/25464295/dump-a-list-in-a-pickle-file-and-retrieve-it-back-later
 #     with open(QUERY_CACHE_FILE, "rb") as f:
 #         query_cache = pickle.load(f)
-    contents = repo.get_contents(QUERY_CACHE_FILE)
-    print(contents)
-    file_content = contents.pop(0)
-    print(file_content)
-    query_cache = pickle.load(file_content)
+
+#     # Method 2
+#     contents = repo.get_contents(QUERY_CACHE_FILE)
+#     print(contents)
+#     file_content = contents.pop(0)
+#     print(file_content)
+#     query_cache = pickle.load(file_content)
+
+    # Method 3
+    req = requests.get('https://github.com/sheilaflood/SWB-GVCEH/blob/main/scraper/querylist.pkl')
+    with open(req, "rb") as f:
+        query_cache = pickle.load(f)
 
     ### manage the pickle json twitter for state status
     ### first day today?  yes or no
