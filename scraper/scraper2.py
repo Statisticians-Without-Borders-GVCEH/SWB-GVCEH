@@ -416,7 +416,7 @@ def batch_scrape():
     # https://stackoverflow.com/questions/25464295/dump-a-list-in-a-pickle-file-and-retrieve-it-back-later
 #     with open(QUERY_CACHE_FILE, "rb") as f:
 #         query_cache = pickle.load(f)
-    f = repository.get_contents(QUERY_CACHE_FILE)
+    f = repo.get_contents(QUERY_CACHE_FILE)
     picle.dump(queries, f)
 
     ### manage the pickle json twitter for state status
