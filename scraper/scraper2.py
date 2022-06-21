@@ -204,6 +204,7 @@ def save_results(RESULTS):
     repo.create_file(git_file, "committing new file", df_csv, branch="main")
     print("Done with scraper.py!!!")
 
+    """
     ### write to csv
     filename = f"./data/post-scraper/GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
 
@@ -214,6 +215,7 @@ def save_results(RESULTS):
 
     print(df.head(10))
     print(df.shape)
+    """
 
 
 def load_keywords():
