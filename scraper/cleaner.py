@@ -26,12 +26,13 @@ def clean_tweets(df):
 
 if __name__ == "__main__":
 
-    filename = "../data/post-scraper/GVCEH-2022-06-20-tweet-raw.csv"
+    filename = "../data/scraped/GVCEH-2022-06-20-tweet-raw.csv"
 
     df = pd.read_csv(filename)
 
     df = clean_tweets(df)
 
     newname = filename.replace("raw", "cleaned")
+    newname = newname.replace("scraped", "cleaned")
 
     df.to_csv(newname)
