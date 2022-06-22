@@ -204,7 +204,7 @@ def save_results(RESULTS):
     # print("Done with scraper.py!!!")
 
     ### write to csv
-    filename = f"../data/post-scraper/GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
+    filename = f"../data/scraped/GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
 
     if os.path.isfile(filename):
         df.to_csv(filename, encoding="utf-8", mode="a", header=False, index=False)
