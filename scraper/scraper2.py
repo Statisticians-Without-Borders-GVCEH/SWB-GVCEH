@@ -481,6 +481,8 @@ def batch_scrape():
                     base_data = data
                     flag -= 1
                     print("Caught Flag!!")
+                    
+                base_data.append(data)
 
         except Exception as e:
 
