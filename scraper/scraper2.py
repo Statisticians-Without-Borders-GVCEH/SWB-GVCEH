@@ -494,7 +494,7 @@ def batch_scrape():
         time.sleep(1)
 
     ### update scrape info
-    save_results(data_base)
+    save_results(base_data)
 
 
 if __name__ == "__main__":
