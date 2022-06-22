@@ -498,6 +498,8 @@ def batch_scrape():
 
     ### update scrape info
     final_results = [x for xs in base_data for x in xs]
+    print("------------ FINAL RESULTS ---------------")
+    print(final_results)
     save_results(final_results)
 
 
