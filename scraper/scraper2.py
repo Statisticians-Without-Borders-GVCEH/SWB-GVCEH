@@ -76,8 +76,8 @@ def query_twitter(TW_QUERY, RELEVANT_REGION, START_TIME, END_TIME):
     return_data = []
     search_query = TW_QUERY.replace(" and ", ' "and" ')
 
-    print("=" * 40)
-    print(f"Searching for... {search_query}")
+#     print("=" * 40)
+#     print(f"Searching for... {search_query}")
     # print("Searching...")
     # print(TW_QUERY)
 
