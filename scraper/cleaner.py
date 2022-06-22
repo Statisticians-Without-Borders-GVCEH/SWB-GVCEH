@@ -1,4 +1,6 @@
 import pandas as pd
+import glob
+import datetime as datetime
 
 
 def clean_tweets(df):
@@ -24,9 +26,14 @@ def clean_tweets(df):
     return df
 
 
-if __name__ == "__main__":
-
-    filename = "../data/scraped/GVCEH-2022-06-20-tweet-raw.csv"
+def clean_csv():
+    """
+    Opens up a csv,
+    cleans it
+    writes new file
+    """
+    # filename = "../data/scraped/GVCEH-2022-06-20-tweet-raw.csv"
+    filename = "../data/post-scraper/all-raw-merged-2022-06-22.csv"
 
     df = pd.read_csv(filename)
 
@@ -35,4 +42,45 @@ if __name__ == "__main__":
     newname = filename.replace("raw", "cleaned")
     newname = newname.replace("scraped", "cleaned")
 
+    ### being lazy and just overwriting
+    newname = "../data/cleaned/all-cleaned-merged-2022-06-22.csv"
+
     df.to_csv(newname)
+
+
+def merge_all_raw_data():
+    """
+    Opens all raw data csvs
+    merges into a single file
+    """
+
+    print("Merging...")
+
+    files = glob.glob("../data/scraped/*raw*.csv")
+
+    ### read in first csv
+    df = pd.read_csv(files[0])
+
+    for f in files[1:]:
+        print(f)
+
+        ### load in the csv
+        newdf = pd.read_csv(f)
+
+        ### append to existing
+        df = pd.concat([df, newdf])
+
+    ### output / save
+    newfile = f"../data/post-scraper/all-raw-merged-{str(datetime.date.today())}.csv"
+
+    df.to_csv(newfile, encoding="utf-8")
+
+    print(df.head(20))
+    print(df.size)
+
+
+if __name__ == "__main__":
+    # TODO: @click to switch
+    clean_csv()
+
+    # merge_all_raw_data()
