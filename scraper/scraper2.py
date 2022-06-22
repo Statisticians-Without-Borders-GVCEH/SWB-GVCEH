@@ -415,13 +415,13 @@ def gen_queries():
 def batch_scrape():
     ### open our pickle cache of queries
     # https://stackoverflow.com/questions/25464295/dump-a-list-in-a-pickle-file-and-retrieve-it-back-later
-#     with open(QUERY_CACHE_FILE, "rb") as f:
-#         query_cache = pickle.load(f)
+    with open(QUERY_CACHE_FILE, "rb") as f:
+        query_cache = pickle.load(f)
 
     # Method 2
-    contents = repo.get_contents(QUERY_CACHE_FILE)
-    print(contents.decoded_content.decode())
-    query_cache = pickle.load(contents)
+#     contents = repo.get_contents(QUERY_CACHE_FILE)
+#     print(contents.decoded_content.decode())
+#     query_cache = pickle.load(contents)
 
 #     # Method 3
 #     req = requests.get('https://github.com/sheilaflood/SWB-GVCEH/blob/main/scraper/querylist.pkl')
