@@ -191,11 +191,10 @@ def query_twitter(TW_QUERY, RELEVANT_REGION, START_TIME, END_TIME):
 
 
 def save_results(RESULTS):
-    # pprint(RESULTS)
 
     ### create pandas df of all twitter
     df = pd.DataFrame(RESULTS)
-    print(df.head())
+    df.head()
 
     df = model.sentiment_model(df)  # adding model scores
     df = cleaner.clean_tweets(df)  # post-scraping cleaner
