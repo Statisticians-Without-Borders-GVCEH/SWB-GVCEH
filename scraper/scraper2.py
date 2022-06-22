@@ -461,8 +461,9 @@ def batch_scrape():
     # convert to strings
     start_time, end_time = start_time.strftime(dtformat), end_time.strftime(dtformat)
     
-    data_base = query_twitter(q[0], q[1], start_time, end_time) #TODO: Confirm this works
     for q in our_queries:
+        if q = 1:
+            data_base = query_twitter(q[0], q[1], start_time, end_time)    
 
         num_queries += 1
 
