@@ -497,8 +497,8 @@ def batch_scrape():
         time.sleep(1)
 
     ### update scrape info
-    print(type)
-    save_results(base_data)
+    final_results = [x for xs in base_data for x in xs]
+    save_results(final_results)
 
 
 if __name__ == "__main__":
