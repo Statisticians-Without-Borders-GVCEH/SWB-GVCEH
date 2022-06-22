@@ -195,7 +195,7 @@ def save_results(RESULTS):
 
     ### create pandas df of all twitter
     df = pd.DataFrame(RESULTS)
-    # df = RESULTS
+    print(df.head())
 
     df = model.sentiment_model(df)  # adding model scores
     df = cleaner.clean_tweets(df)  # post-scraping cleaner
