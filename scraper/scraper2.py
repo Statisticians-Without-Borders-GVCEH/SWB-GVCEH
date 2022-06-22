@@ -460,7 +460,8 @@ def batch_scrape():
 
     # convert to strings
     start_time, end_time = start_time.strftime(dtformat), end_time.strftime(dtformat)
-
+    
+    data_base = query_twitter(q[0], q[1], start_time, end_time) #TODO: Confirm this works
     for q in our_queries:
 
         num_queries += 1
@@ -476,7 +477,8 @@ def batch_scrape():
 
             ### scave our twitter - only if we got any
             if data:
-                save_results(data)
+                # save_results(data)
+                data_base.append(data)
 
         except Exception as e:
 
@@ -490,6 +492,7 @@ def batch_scrape():
         time.sleep(1)
 
     ### update scrape info
+    save_results(data_base)
 
 
 if __name__ == "__main__":
