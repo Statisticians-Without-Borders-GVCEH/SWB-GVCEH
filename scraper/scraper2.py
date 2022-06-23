@@ -193,17 +193,9 @@ def query_twitter(TW_QUERY, RELEVANT_REGION, START_TIME, END_TIME):
 def save_results(RESULTS):
 
     ### create pandas df of all twitter
-    df = pd.DataFrame(RESULTS)
-    print("------------------PRINTING COLUMNS ------------------")
-    print(df.columns)
 
-    df = model.sentiment_model(df)  # adding model scores
+    df = model.sentiment_model(RESULTS)  # adding model scores
     df = cleaner.clean_tweets(df)  # post-scraping cleaner
-
-#     # open github api connection
-#     g = Github(USERNAME, TOKEN)
-#     user = g.get_user(USERNAME)
-#     repo = user.get_repo("SWB-GVCEH")
 
     # upload to github
     filename = f"GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
@@ -478,12 +470,16 @@ def batch_scrape():
 
             ### scave our twitter - only if we got any
             if data:
+                data_cleaned = [{k: v for k, v in d.items() if k not in ('geo_bbox', 'tweet_coordinate')} for d in data]
+                df = pd.DataFrame(data_cleaned)
+
                 if flag == 1:
-                    base_data = data
+                    final_results = df
                     flag -= 1
-                    print("Caught Flag!!")
-                    
-                base_data.append(data)
+
+                final_results = pd.concat([final_results, df])
+                print(final_results.tail())
+
 
         except Exception as e:
 
@@ -497,9 +493,6 @@ def batch_scrape():
         time.sleep(1)
 
     ### update scrape info
-    final_results = [x for xs in base_data for x in xs]
-    print("------------ FINAL RESULTS ---------------")
-    print(final_results)
     save_results(final_results)
 
 
