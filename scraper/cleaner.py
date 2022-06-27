@@ -32,8 +32,8 @@ def clean_csv():
     cleans it
     writes new file
     """
-    # filename = "../data/scraped/GVCEH-2022-06-20-tweet-raw.csv"
-    filename = "../data/post-scraper/all-raw-merged-2022-06-22.csv"
+    filename = "../data/scraped/GVCEH-2022-06-27-tweet-raw.csv"
+    # filename = "../data/post-scraper/all-raw-merged-2022-06-22.csv" # merged data
 
     df = pd.read_csv(filename)
 
@@ -43,7 +43,7 @@ def clean_csv():
     newname = newname.replace("scraped", "cleaned")
 
     ### being lazy and just overwriting
-    newname = "../data/cleaned/all-cleaned-merged-2022-06-22.csv"
+    # newname = "../data/cleaned/all-cleaned-merged-2022-06-22.csv" # for merged data
 
     df.to_csv(newname)
 
