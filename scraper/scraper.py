@@ -27,9 +27,19 @@ if os.getenv("API_KEY") is not None:
     ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
     ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
 
-    QUERY_CACHE_FILE = "querylist.pkl"
+#     QUERY_CACHE_FILE = "querylist.pkl"
+#     METHOD = 'LOCAL'
 
-    METHOD = 'LOCAL'
+    USERNAME = os.environ["USERNAME"]  # for github api
+    TOKEN = os.environ["TOKEN"]  # for github api
+
+    # open github api connection
+    g = Github(USERNAME, TOKEN)
+    user = g.get_user(USERNAME)
+    repo = user.get_repo("SWB-GVCEH")
+
+    QUERY_CACHE_FILE = "scraper/querylist.pkl"
+    METHOD = 'GITHUB ACTIONS'
 
 else:  # load environment variables using secret tokens
     API_KEY = os.environ["API_KEY"]
