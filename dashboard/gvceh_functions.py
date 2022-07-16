@@ -55,6 +55,7 @@ def get_prior_period(start, end):
 
     return prev_start, prev_end
 
+# test: 01_test_prior_period_calc
 
 def get_frames(start, end, df):
     ''' Get a two subsets of a dataframe based on start and end dates,
@@ -86,7 +87,11 @@ def agg_sentiments_by_category(cdf, pdf):
     by_category = cagg.join(pagg).reset_index()
     by_category.columns = ['Sentiment', 'Current', 'Prior']
 
+    by_category.sort_values(by=['Sentiment'], ascending=False, inplace=True)
+
     return by_category
+
+# test: 02_test_sentiment_agg
 
 
 
@@ -103,19 +108,22 @@ def top_influencers(cdf):
 
     return current_influencers
 
+# test: 03_test_top_influencers
+
 
 def get_appendix_a_locations():
     df = pd.read_csv('./appendices/aa.csv')
     return(df)
 
-def get_lat_long(left_df):
-    right_df = pd.read_csv('./twitter/demo/Geolocation_Mapping - Sheet1.csv')
-    return left_df.merge(right_df, left_on='search_neighbourhood',
-                         right_on='Appendix A Location', how='inner')
+# def get_lat_long(left_df):
+#     right_df = pd.read_csv('./twitter/demo/Geolocation_Mapping - Sheet1.csv')
+#     return left_df.merge(right_df, left_on='search_neighbourhood',
+#                          right_on='Appendix A Location', how='inner')
 
-def get_locations(agg_option):
-    df = pd.read_csv('./appendices/aa.csv')
-    return df.loc[df["Category"] == agg_option, "Location"].tolist()
+def get_locations(appendix_df, agg_option):
+    # df = pd.read_csv('./appendices/aa.csv')
+    return appendix_df.loc[appendix_df["Category"] == agg_option, "Location"].tolist()
+
 
 # def agg_tweets_by_users(cdf, pdf):
 # 	''' Aggregating number of tweets by username.'''
