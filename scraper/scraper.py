@@ -48,6 +48,8 @@ else:  # load environment variables using secret tokens
 
     QUERY_CACHE_FILE = "scraper/querylist.pkl"
     METHOD = 'GITHUB ACTIONS'
+    
+print(METHOD)
 
 ### setting up the config
 MAX_TWEETS = 100
