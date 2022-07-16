@@ -40,7 +40,7 @@ jobs:
           pip install PyGithub
           pip install tensorflow
           pip install transformers
-          python scraper/scraper2.py
+          python scraper/scraper.py
 
 
   
