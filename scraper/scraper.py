@@ -7,35 +7,47 @@ import model  # gvceh functions
 import cleaner  # gvceh functions
 import tweepy as tw
 import pandas as pd
+import requests
 
-# from github import Github
-# from transformers import pipeline
+from github import Github
+from transformers import pipeline
 
 from pprint import pprint
-from dotenv import load_dotenv
+import dotenv
 
-load_dotenv()  # imprt out enviroment variables
+dotenv.load_dotenv()  # imprt out enviroment variables
 
-API_KEY = os.environ.get("API_KEY")  # consumer
-API_SECRET_KEY = os.environ.get("API_SECRET_KEY")  # consumer
-BEARER_TOKEN = os.environ.get("BEARER_TOKEN")
+# Method #1: If .env file exists, use
+if os.getenv("API_KEY") is not None:
 
-ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
-ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
+    API_KEY = os.environ.get("API_KEY")  # consumer
+    API_SECRET_KEY = os.environ.get("API_SECRET_KEY")  # consumer
+    BEARER_TOKEN = os.environ.get("BEARER_TOKEN")
 
-USERNAME = os.environ.get("USERNAME")  # for github api
-TOKEN = os.environ.get("TOKEN")  # for github api
+    ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
+    ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
 
+    QUERY_CACHE_FILE = "querylist.pkl"
 
-# load environment variables using secret tokens
-"""API_KEY = os.environ["API_KEY"]
-API_SECRET_KEY = os.environ["API_SECRET_KEY"]
-BEARER_TOKEN = os.environ["BEARER_TOKEN"]
-ACCESS_TOKEN = os.environ["ACCESS_TOKEN"]
-ACCESS_TOKEN_SECRET = os.environ["ACCESS_TOKEN_SECRET"]
+    METHOD = 'LOCAL'
 
-USERNAME = os.environ["USERNAME"]  # for github api
-TOKEN = os.environ["TOKEN"]  # for github api"""
+else:  # load environment variables using secret tokens
+    API_KEY = os.environ["API_KEY"]
+    API_SECRET_KEY = os.environ["API_SECRET_KEY"]
+    BEARER_TOKEN = os.environ["BEARER_TOKEN"]
+    ACCESS_TOKEN = os.environ["ACCESS_TOKEN"]
+    ACCESS_TOKEN_SECRET = os.environ["ACCESS_TOKEN_SECRET"]
+
+    USERNAME = os.environ["USERNAME"]  # for github api
+    TOKEN = os.environ["TOKEN"]  # for github api
+
+    # open github api connection
+    g = Github(USERNAME, TOKEN)
+    user = g.get_user(USERNAME)
+    repo = user.get_repo("SWB-GVCEH")
+
+    QUERY_CACHE_FILE = "scraper/querylist.pkl"
+    METHOD = 'GITHUB ACTIONS'
 
 ### setting up the config
 MAX_TWEETS = 100
@@ -48,8 +60,8 @@ QUERY_MAX_LENGTH = 512
 SUB_QUERY_CHUNKS = 10  ### how many queries we split Appendix C + E + D into
 NUM_ACCOUNTS_TO_TARGET = 5  ### How many queries we split Appendix B into
 NEIGHBOURHOOD_CHUNKS = 10  ### split neighbourhood into how many chunks ?
-QUERY_CACHE_FILE = "querylist.pkl"
 
+# twitter api
 client = tw.Client(bearer_token=BEARER_TOKEN)
 
 
@@ -59,7 +71,7 @@ client = tw.Client(bearer_token=BEARER_TOKEN)
 # tweepy / api v2 info
 
 
-def query_twitter(TW_QUERY, RELEVANT_REGION):
+def query_twitter(TW_QUERY, RELEVANT_REGION, START_TIME, END_TIME):
     """
     Run one query against the API and store it
     """
@@ -67,8 +79,8 @@ def query_twitter(TW_QUERY, RELEVANT_REGION):
     return_data = []
     search_query = TW_QUERY.replace(" and ", ' "and" ')
 
-    print("=" * 40)
-    print(f"Searching for... {search_query}")
+    #     print("=" * 40)
+    #     print(f"Searching for... {search_query}")
     # print("Searching...")
     # print(TW_QUERY)
 
@@ -76,8 +88,8 @@ def query_twitter(TW_QUERY, RELEVANT_REGION):
     ### limits us last 7 days, need elevated account for longer than that
     tweets = client.search_recent_tweets(
         query=search_query,
-        # start_time=start_time,
-        # end_time=end_time,
+        start_time=START_TIME,
+        end_time=END_TIME,
         tweet_fields=[
             "context_annotations",
             "public_metrics",
@@ -96,7 +108,7 @@ def query_twitter(TW_QUERY, RELEVANT_REGION):
         ],
         max_results=MAX_TWEETS,
         place_fields=["country", "geo", "name", "place_type"],
-        expansions=["author_id", "geo.place_id"],
+        expansions=["author_id", "geo.place_id", "referenced_tweets.id"],
     )
 
     ### not yielding anything? exit early
@@ -127,6 +139,20 @@ def query_twitter(TW_QUERY, RELEVANT_REGION):
 
         # original text
         newtweet["text"] = tweet.text
+
+        ### working on quote tweets:
+        if tweet.referenced_tweets:
+            # print(tweet.text)
+            for thist in tweet.referenced_tweets:
+                if thist.data["type"] == "quoted":
+                    qt = client.get_tweet(thist.data["id"], tweet_fields=["text"])
+
+                    mergetweet = (
+                            newtweet["text"].strip() + " " + qt.data["text"].strip()
+                    )
+                    mergetweet = mergetweet.replace("\n", "")
+
+                    newtweet["text"] = mergetweet
 
         ### scrape time
         newtweet["scrape_time"] = str(datetime.datetime.now())
@@ -182,37 +208,27 @@ def query_twitter(TW_QUERY, RELEVANT_REGION):
 
 
 def save_results(RESULTS):
-    # pprint(RESULTS)
-
     ### create pandas df of all twitter
-    df = pd.DataFrame(RESULTS)
 
-    # df = model.sentiment_model(df)  # adding model scores
-    # df = cleaner.clean_tweets(df)  # post-scraping cleaner
+    df = model.sentiment_model(RESULTS)  # adding model scores
+    df = cleaner.clean_tweets(df)  # post-scraping cleaner
 
-    # # open github api connection
-    # g = Github(USERNAME, TOKEN)
-    # user = g.get_user(USERNAME)
-    # repo = user.get_repo("SWB-GVCEH")
-
-    # # upload to github
-    # filename = f"GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
-    # df_csv = df.to_csv()
-    # git_file = f"data/processed/twitter/{filename}"
-    # print(git_file)
-    # repo.create_file(git_file, "committing new file", df_csv, branch="main")
-    # print("Done with scraper.py!!!")
-
-    ### write to csv
-    filename = f"../data/scraped/GVCEH-{str(datetime.date.today())}-tweet-raw.csv"
-
-    if os.path.isfile(filename):
-        df.to_csv(filename, encoding="utf-8", mode="a", header=False, index=False)
+    if METHOD == 'GITHUB ACTIONS':
+        # upload to github
+        filename = f"GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
+        df_csv = df.to_csv()
+        git_file = f"data/processed/twitter/{filename}"
+        print(git_file)
+        repo.create_file(git_file, "committing new file", df_csv, branch="main")
+        print("Done with scraper.py!!!")
     else:
-        df.to_csv(filename, encoding="utf-8", index=False)
+        # write to csv
+        filename = f"../data/processed/twitter/GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
 
-    print(df.head(10))
-    print(df.shape)
+        if os.path.isfile(filename):
+            df.to_csv(filename, encoding="utf-8", mode="a", header=False, index=False)
+        else:
+            df.to_csv(filename, encoding="utf-8", index=False)
 
 
 def load_keywords():
@@ -224,13 +240,13 @@ def load_keywords():
         'ae': []
     }
     """
-    data = pd.read_csv("../appendices/ac.csv", index_col=0)
+    data = pd.read_csv("./appendices/ac.csv", index_col=0)
     kw1 = [k.strip().lower() for k in data.Organizations.tolist()]
 
-    data = pd.read_csv("../appendices/ad.csv", index_col=0)
+    data = pd.read_csv("./appendices/ad.csv", index_col=0)
     kw2 = [k.strip().lower() for k in data.sectors.tolist()]
 
-    data = pd.read_csv("../appendices/ae.csv", index_col=0)
+    data = pd.read_csv("./appendices/ae.csv", index_col=0)
     kw3 = [k.strip().lower() for k in data.word.tolist()]
 
     return {"ac": kw1, "ad": kw2, "ae": kw3}
@@ -265,7 +281,7 @@ def gen_query_one(SUB_QUERY):
     """
 
     ### get our neighbourhoods
-    data = pd.read_csv("../appendices/aa_old.csv", index_col=0)
+    data = pd.read_csv("./appendices/aa_old.csv", index_col=0)
 
     neighbourhoods = [n.strip().lower() for n in data.Location.tolist()]
 
@@ -325,7 +341,7 @@ def gen_query_two(SUB_QUERY):
 
 
 def chunker(seq, size):
-    return (seq[pos : pos + size] for pos in range(0, len(seq), size))
+    return (seq[pos: pos + size] for pos in range(0, len(seq), size))
 
 
 def gen_query_three(SUB_QUERY):
@@ -334,11 +350,11 @@ def gen_query_three(SUB_QUERY):
     """
 
     ### load the names from the appendix
-    data = pd.read_csv("../appendices/aborganizations.csv", index_col=0)
+    data = pd.read_csv("./appendices/aborganizations.csv", index_col=0)
 
     orgs = [n.strip().lower() for n in data.Organizations.tolist()]
 
-    data = pd.read_csv("../appendices/abpersons.csv", index_col=0)
+    data = pd.read_csv("./appendices/abpersons.csv", index_col=0)
 
     pers = [n.strip().lower() for n in data.Influencers.tolist()]
 
@@ -428,6 +444,18 @@ def batch_scrape():
     ### TODO: STORE ON BREAK
     our_queries = query_cache[QUERY_START_AT:]
 
+    dtformat = '%Y-%m-%dT%H:%M:%SZ'
+    current_time = datetime.datetime.utcnow()
+    start_time = current_time - datetime.timedelta(days=2)
+
+    # Subtracting 15 seconds because api needs end_time must be a minimum of 10
+    # seconds prior to the request time
+    end_time = current_time - datetime.timedelta(seconds=15)
+
+    # convert to strings
+    start_time, end_time = start_time.strftime(dtformat), end_time.strftime(dtformat)
+
+    flag = 1
     for q in our_queries:
 
         num_queries += 1
@@ -436,13 +464,23 @@ def batch_scrape():
 
             ### pass to scrape
             ### scrape and save
-            data = query_twitter(q[0], q[1])
+
+            data = query_twitter(q[0], q[1], start_time, end_time)
 
             num_results += len(data)
 
             ### scave our twitter - only if we got any
             if data:
-                save_results(data)
+                data_cleaned = [{k: v for k, v in d.items() if k not in ('geo_bbox', 'tweet_coordinate')} for d in data]
+                df = pd.DataFrame(data_cleaned)
+
+                if flag == 1:
+                    final_results = df
+                    flag -= 1
+
+                final_results = pd.concat([final_results, df])
+                print(final_results.tail())
+
 
         except Exception as e:
 
@@ -456,6 +494,7 @@ def batch_scrape():
         time.sleep(1)
 
     ### update scrape info
+    save_results(final_results)
 
 
 if __name__ == "__main__":
@@ -467,3 +506,4 @@ if __name__ == "__main__":
 
     ### batch scrape
     batch_scrape()
+
