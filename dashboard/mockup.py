@@ -198,11 +198,6 @@ with header:
 		data=k_pivot.to_csv().encode('utf-8'),
 		file_name='geolocations.csv')
 
-st.download_button(
-		label="Download results as CSV",
-		data=current_influencers.to_csv().encode('utf-8'),
-		file_name='current_influencers.csv')
-
 
 
 
