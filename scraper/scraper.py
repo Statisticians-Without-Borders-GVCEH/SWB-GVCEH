@@ -96,7 +96,7 @@ def query_twitter(TW_QUERY, RELEVANT_REGION):
         ],
         max_results=MAX_TWEETS,
         place_fields=["country", "geo", "name", "place_type"],
-        expansions=["author_id", "geo.place_id"],
+        expansions=["author_id", "geo.place_id", "referenced_tweets.id"],
     )
 
     ### not yielding anything? exit early
@@ -127,6 +127,21 @@ def query_twitter(TW_QUERY, RELEVANT_REGION):
 
         # original text
         newtweet["text"] = tweet.text
+
+        ### working on quote tweets:
+        if tweet.referenced_tweets:
+            # print(tweet.text)
+            for thist in tweet.referenced_tweets:
+                if thist.data["type"] == "quoted":
+
+                    qt = client.get_tweet(thist.data["id"], tweet_fields=["text"])
+
+                    mergetweet = (
+                        newtweet["text"].strip() + " " + qt.data["text"].strip()
+                    )
+                    mergetweet = mergetweet.replace("\n", "")
+
+                    newtweet["text"] = mergetweet
 
         ### scrape time
         newtweet["scrape_time"] = str(datetime.datetime.now())
