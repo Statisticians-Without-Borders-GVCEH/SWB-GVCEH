@@ -82,11 +82,11 @@ client = tw.Client(bearer_token=BEARER_TOKEN)
 # https://datascienceparichay.com/article/python-get-data-from-twitter-api-v2/
 # tweepy / api v2 info
 
-
+print("READING CSV FROM GITHUB")
 consolidated_file_path = 'https://github.com/sheilaflood/SWB-GVCEH/blob/main/data/processed/twitter/GVCEH-tweets-combined.csv'
-df = pd.read_csv(consolidated_file_path)
-print(df)
-
+s=requests.get(consolidated_file_path).content
+c=pd.read_csv(io.StringIO(s.decode('utf-8')))
+print(c.head(5))
 
 def save_results(RESULTS):
     ### create pandas df of all twitter
