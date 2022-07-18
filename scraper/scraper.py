@@ -7,6 +7,7 @@ import model  # gvceh functions
 import cleaner  # gvceh functions
 import tweepy as tw
 import pandas as pd
+import io
 import requests
 
 from github import Github
