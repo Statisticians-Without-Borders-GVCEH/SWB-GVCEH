@@ -83,6 +83,34 @@ client = tw.Client(bearer_token=BEARER_TOKEN)
 # tweepy / api v2 info
 
 
+consolidated_file_path = 'https://github.com/sheilaflood/SWB-GVCEH/blob/main/data/processed/twitter/GVCEH-tweets-combined.csv'
+df = pd.read_csv(consolidated_file_path)
+print(df)
+
+
+def save_results(RESULTS):
+    ### create pandas df of all twitter
+
+    df = model.sentiment_model(RESULTS)  # adding model scores
+    df = cleaner.clean_tweets(df)  # post-scraping cleaner
+
+    if METHOD == 'GITHUB ACTIONS':
+        # upload to github
+#         filename = f"GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
+#         df_csv = df.to_csv()
+        git_file = f"data/processed/twitter/{filename}"
+        print(git_file)
+        repo.create_file(git_file, "committing new file", df_csv, branch="main")
+        print("Done with scraper.py!!!")
+    else:
+        # write to csv
+        filename = f"../data/processed/twitter/GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
+
+        if os.path.isfile(filename):
+            df.to_csv(filename, encoding="utf-8", mode="a", header=False, index=False)
+        else:
+            df.to_csv(filename, encoding="utf-8", index=False)
+
 def query_twitter(TW_QUERY, RELEVANT_REGION, START_TIME, END_TIME):
     """
     Run one query against the API and store it
@@ -218,29 +246,6 @@ def query_twitter(TW_QUERY, RELEVANT_REGION, START_TIME, END_TIME):
 
     return return_data
 
-
-def save_results(RESULTS):
-    ### create pandas df of all twitter
-
-    df = model.sentiment_model(RESULTS)  # adding model scores
-    df = cleaner.clean_tweets(df)  # post-scraping cleaner
-
-    if METHOD == 'GITHUB ACTIONS':
-        # upload to github
-        filename = f"GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
-        df_csv = df.to_csv()
-        git_file = f"data/processed/twitter/{filename}"
-        print(git_file)
-        repo.create_file(git_file, "committing new file", df_csv, branch="main")
-        print("Done with scraper.py!!!")
-    else:
-        # write to csv
-        filename = f"../data/processed/twitter/GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
-
-        if os.path.isfile(filename):
-            df.to_csv(filename, encoding="utf-8", mode="a", header=False, index=False)
-        else:
-            df.to_csv(filename, encoding="utf-8", index=False)
 
 
 def load_keywords():
