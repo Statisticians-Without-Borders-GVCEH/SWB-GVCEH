@@ -83,26 +83,40 @@ client = tw.Client(bearer_token=BEARER_TOKEN)
 # https://datascienceparichay.com/article/python-get-data-from-twitter-api-v2/
 # tweepy / api v2 info
 
-print("READING CSV FROM GITHUB")
-consolidated_file_path = 'https://github.com/sheilaflood/SWB-GVCEH/blob/main/data/processed/twitter/GVCEH-tweets-combined.csv'
-s=requests.get(consolidated_file_path).content
-c=pd.read_csv(io.StringIO(s.decode('utf-8')))
-print(c.head(5))
 
 def save_results(RESULTS):
     ### create pandas df of all twitter
 
     df = model.sentiment_model(RESULTS)  # adding model scores
-    df = cleaner.clean_tweets(df)  # post-scraping cleaner
+    df_new = cleaner.clean_tweets(df)  # post-scraping cleaner
+    df_new = df_new[["text", "scrape_time", "tweet_id", "created_at", "reply_count", "quote_count",
+                "like_count", "retweet_count", "geo_full_name", "geo_id", "username", "num_followers",
+                "search_keywords", "search_neighbourhood", "sentiment", "score"]]
+    print('New Tweets: ', df_new.shape)
+    
+    consolidated_file_path = f"https://raw.githubusercontent.com/sheilaflood/SWB-GVCEH/main/data/processed/twitter/GVCEH-tweets-combined.csv"
+    s=requests.get(consolidated_file_path).content
+    df_old=pd.read_csv(io.StringIO(s.decode('utf-8')))
+    print('Original CSV: ', df_old.shape)
+
+    df_old = df_old[["text", "scrape_time", "tweet_id", "created_at", "reply_count", "quote_count",
+                    "like_count", "retweet_count", "geo_full_name", "geo_id", "username", "num_followers",
+                    "search_keywords", "search_neighbourhood", "sentiment", "score"]]
+    
+    df3 = pd.concat([df_old,df_new]).drop_duplicates(subset='tweet_id', keep="last").reset_index(drop=True)
+    print('Combined CSVs: ', df3.shape)
+
 
     if METHOD == 'GITHUB ACTIONS':
         # upload to github
-#         filename = f"GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
-#         df_csv = df.to_csv()
+        filename = f"GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
+        df_csv = df.to_csv()
         git_file = f"data/processed/twitter/{filename}"
         print(git_file)
         repo.create_file(git_file, "committing new file", df_csv, branch="main")
         print("Done with scraper.py!!!")
+
+        
     else:
         # write to csv
         filename = f"../data/processed/twitter/GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
