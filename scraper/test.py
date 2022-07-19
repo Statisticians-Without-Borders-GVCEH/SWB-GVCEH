@@ -31,4 +31,8 @@ print("READING CSV FROM GITHUB")
 consolidated_file_path = 'https://github.com/sheilaflood/SWB-GVCEH/blob/main/data/processed/twitter/GVCEH-tweets-combined.csv'
 s=requests.get(consolidated_file_path).content
 c=pd.read_csv(io.StringIO(s.decode('utf-8')))
-print(c.head(5))
+
+print("Updating same file") 
+df_csv = c.to_csv()
+repo.update_file(consolidated_file_path, "Adding new tweets", df_csv, branch="main")
+print("Done with scraper.py!!!")
