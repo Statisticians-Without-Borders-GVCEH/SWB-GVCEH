@@ -114,7 +114,7 @@ def save_results(RESULTS):
         git_file = f"data/processed/twitter/{filename}"
         print(git_file)
         # repo.create_file(git_file, message = "committing new file", df_csv, branch="main")
-        repo.update_file(path = consolidated_file_path, message = "Adding new tweets", branch="main", sha = sha, content = df_csv)
+        repo.update_file(path = consolidated_file_path, message = "Adding new tweets", branch="main", content = df_csv)
         print("Done with scraper.py!!!")
 
         
