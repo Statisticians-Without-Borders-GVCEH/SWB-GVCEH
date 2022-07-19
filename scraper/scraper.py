@@ -110,7 +110,7 @@ def save_results(RESULTS):
     if METHOD == 'GITHUB ACTIONS':
         # upload to github
         filename = f"GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
-        df_csv = df.to_csv()
+        df_csv = df3.to_csv()
         git_file = f"data/processed/twitter/{filename}"
         print(git_file)
         repo.create_file(git_file, "committing new file", df_csv, branch="main")
