@@ -113,8 +113,8 @@ def save_results(RESULTS):
         df_csv = df3.to_csv()
         git_file = f"data/processed/twitter/{filename}"
         print(git_file)
-        # repo.create_file(git_file, "committing new file", df_csv, branch="main")
-        repo.update_file(git_file, "Adding new tweets", branch="main", sha = sha, df_csv)
+        # repo.create_file(git_file, message = "committing new file", df_csv, branch="main")
+        repo.update_file(path = git_file, message = "Adding new tweets", branch="main", sha = sha, content = df_csv)
         print("Done with scraper.py!!!")
 
         
