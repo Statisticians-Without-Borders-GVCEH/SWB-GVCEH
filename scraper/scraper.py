@@ -95,8 +95,9 @@ def save_results(RESULTS):
     print('New Tweets: ', df_new.shape)
     
     consolidated_file_path = f"https://raw.githubusercontent.com/sheilaflood/SWB-GVCEH/main/data/processed/twitter/GVCEH-tweets-combined.csv"
-    s=requests.get(consolidated_file_path).content
-    df_old=pd.read_csv(io.StringIO(s.decode('utf-8')))
+    s=requests.get(consolidated_file_path)
+    j = s.content
+    df_old=pd.read_csv(io.StringIO(j.decode('utf-8')))
     print('Original CSV: ', df_old.shape)
 
     df_old = df_old[["text", "scrape_time", "tweet_id", "created_at", "reply_count", "quote_count",
@@ -115,7 +116,7 @@ def save_results(RESULTS):
         print(git_file)
         # repo.create_file(git_file, message = "committing new file", df_csv, branch="main")
         
-        repo.update_file(path = consolidated_file_path, message = "Adding new tweets", sha = '111111', branch="main", content = df_csv)
+        repo.update_file(path = consolidated_file_path, message = "Adding new tweets", sha = s.sha, branch="main", content = df_csv)
         print("Done with scraper.py!!!")
 
         
