@@ -30,7 +30,7 @@ repo = user.get_repo("SWB-GVCEH")
 print("READING CSV FROM GITHUB")
 
 consolidated_file_path = f"https://raw.githubusercontent.com/sheilaflood/SWB-GVCEH/main/data/processed/twitter/GVCEH-tweets-combined.csv"
-r=requests.get(consolidated_file_path)
+r=requests.get(consolidated_file_path).content
 
 df_old=pd.read_csv(io.StringIO(r.decode('utf-8')))
 print('Original CSV: ', df_old.shape)
