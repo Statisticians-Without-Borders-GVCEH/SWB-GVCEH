@@ -41,11 +41,9 @@ df_old = df_old[["text", "scrape_time", "tweet_id", "created_at", "reply_count",
 
 df_csv = df_old.to_csv()
 
-print("Type of file:", type(df_old)))
-print(df_csv)
-
 from pandas.util import hash_pandas_object
 h = hash_pandas_object(df_csv).sum()
+print("Hash of file:", h)
 
 repo.update_file(path = consolidated_file_path, message = "Adding new tweets", sha = h, branch="main", content = df_csv)
 print("Done with scraper.py!!!")
