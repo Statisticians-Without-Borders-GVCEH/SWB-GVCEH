@@ -38,10 +38,10 @@ df_old = df_old[["text", "scrape_time", "tweet_id", "created_at", "reply_count",
                     "like_count", "retweet_count", "geo_full_name", "geo_id", "username", "num_followers",
                     "search_keywords", "search_neighbourhood", "sentiment", "score"]]
     
-print(df_old.head())
-
 
 df_csv = df_old.to_csv()
+
+print("Type of file:", type(df_old)))
 
 repo.update_file(path = consolidated_file_path, message = "Adding new tweets", sha = df_csv.sha, branch="main", content = df_csv)
 print("Done with scraper.py!!!")
