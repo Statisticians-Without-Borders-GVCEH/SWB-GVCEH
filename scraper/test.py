@@ -31,8 +31,6 @@ print("READING CSV FROM GITHUB")
 
 consolidated_file_path = f"https://raw.githubusercontent.com/sheilaflood/SWB-GVCEH/main/data/processed/twitter/GVCEH-tweets-combined.csv"
 r=requests.get(consolidated_file_path)
-sha = requests.get(consolidated_file_path).sha
-print("SHA: ", sha)
 
 df_old=pd.read_csv(io.StringIO(s.decode('utf-8')))
 print('Original CSV: ', df_old.shape)
@@ -45,5 +43,5 @@ df_old = df_old[["text", "scrape_time", "tweet_id", "created_at", "reply_count",
 df_csv = df_old.to_csv()
 
 
-repo.update_file(path = consolidated_file_path, message = "Adding new tweets", sha = sha, branch="main", content = df_csv)
+repo.update_file(path = '/data/processed/twitter/GVCEH-tweets-combined.csv', message = "Adding new tweets", branch="main", content = df_csv)
 print("Done with scraper.py!!!")
