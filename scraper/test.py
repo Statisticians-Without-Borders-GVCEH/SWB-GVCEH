@@ -43,5 +43,5 @@ df_old = df_old[["text", "scrape_time", "tweet_id", "created_at", "reply_count",
 df_csv = df_old.to_csv()
 
 
-repo.create_file(path = '/data/processed/twitter/GVCEH-tweets-combined.csv', message = "Adding new tweets", branch="main", content = df_csv)
+repo.create_file(path = 'data/processed/twitter/GVCEH-tweets-combined.csv', message = "Adding new tweets", branch="main", content = df_csv)
 print("Done with scraper.py!!!")
