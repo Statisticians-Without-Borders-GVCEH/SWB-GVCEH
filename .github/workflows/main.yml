@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8 #install the python needed
-      - name: execute scraper.py "actions"
+      - name: execute scraper.py 
         env: 
           USERNAME: ${{ secrets.USERNAME }}
           TOKEN: ${{ secrets.TOKEN }}
@@ -40,7 +40,7 @@ jobs:
           pip install PyGithub
           pip install tensorflow
           pip install transformers
-          python scraper/test.py
+          python scraper/scraper.py "github_actions"
 
 
   
