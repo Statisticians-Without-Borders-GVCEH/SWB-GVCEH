@@ -5,8 +5,10 @@ import os.path
 import time
 import model  # gvceh functions
 import cleaner  # gvceh functions
+import scraper_functions #gvceh functions
 import tweepy as tw
 import pandas as pd
+import sys
 import io
 import requests
 
@@ -16,51 +18,7 @@ from transformers import pipeline
 from pprint import pprint
 import dotenv
 
-dotenv.load_dotenv()  # imprt out enviroment variables
 
-# Method #1: If .env file exists, use
-if os.getenv("API_KEY") is not None:
-
-    API_KEY = os.environ.get("API_KEY")  # consumer
-    API_SECRET_KEY = os.environ.get("API_SECRET_KEY")  # consumer
-    BEARER_TOKEN = os.environ.get("BEARER_TOKEN")
-
-    ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
-    ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
-
-#     QUERY_CACHE_FILE = "querylist.pkl"
-#     METHOD = 'LOCAL'
-
-    USERNAME = os.environ["USERNAME"]  # for github api
-    TOKEN = os.environ["TOKEN"]  # for github api
-
-    # open github api connection
-    g = Github(USERNAME, TOKEN)
-    user = g.get_user(USERNAME)
-    repo = user.get_repo("SWB-GVCEH")
-
-    QUERY_CACHE_FILE = "scraper/querylist.pkl"
-    METHOD = 'GITHUB ACTIONS'
-
-else:  # load environment variables using secret tokens
-    API_KEY = os.environ["API_KEY"]
-    API_SECRET_KEY = os.environ["API_SECRET_KEY"]
-    BEARER_TOKEN = os.environ["BEARER_TOKEN"]
-    ACCESS_TOKEN = os.environ["ACCESS_TOKEN"]
-    ACCESS_TOKEN_SECRET = os.environ["ACCESS_TOKEN_SECRET"]
-
-    USERNAME = os.environ["USERNAME"]  # for github api
-    TOKEN = os.environ["TOKEN"]  # for github api
-
-    # open github api connection
-    g = Github(USERNAME, TOKEN)
-    user = g.get_user(USERNAME)
-    repo = user.get_repo("SWB-GVCEH")
-
-    QUERY_CACHE_FILE = "scraper/querylist.pkl"
-    METHOD = 'GITHUB ACTIONS'
-    
-print(METHOD)
 
 ### setting up the config
 MAX_TWEETS = 100
@@ -74,59 +32,6 @@ SUB_QUERY_CHUNKS = 10  ### how many queries we split Appendix C + E + D into
 NUM_ACCOUNTS_TO_TARGET = 5  ### How many queries we split Appendix B into
 NEIGHBOURHOOD_CHUNKS = 10  ### split neighbourhood into how many chunks ?
 
-# twitter api
-client = tw.Client(bearer_token=BEARER_TOKEN)
-
-
-# url = "curl -X GET -H "Authorization: Bearer <BEARER TOKEN>" "https://api.twitter.com/2/tweets/20""
-
-# https://datascienceparichay.com/article/python-get-data-from-twitter-api-v2/
-# tweepy / api v2 info
-
-
-def save_results(RESULTS):
-    ### create pandas df of all twitter
-
-    df = model.sentiment_model(RESULTS)  # adding model scores
-    df_new = cleaner.clean_tweets(df)  # post-scraping cleaner
-    df_new = df_new[["text", "scrape_time", "tweet_id", "created_at", "reply_count", "quote_count",
-                "like_count", "retweet_count", "geo_full_name", "geo_id", "username", "num_followers",
-                "search_keywords", "search_neighbourhood", "sentiment", "score"]]
-    print('New Tweets: ', df_new.shape)
-    
-    consolidated_file_path = f"https://raw.githubusercontent.com/sheilaflood/SWB-GVCEH/main/data/processed/twitter/GVCEH-tweets-combined.csv"
-    s=requests.get(consolidated_file_path).content
-    df_old=pd.read_csv(io.StringIO(s.decode('utf-8')))
-    print('Original CSV: ', df_old.shape)
-
-    df_old = df_old[["text", "scrape_time", "tweet_id", "created_at", "reply_count", "quote_count",
-                    "like_count", "retweet_count", "geo_full_name", "geo_id", "username", "num_followers",
-                    "search_keywords", "search_neighbourhood", "sentiment", "score"]]
-    
-    df3 = pd.concat([df_old,df_new]).drop_duplicates(subset='tweet_id', keep="last").reset_index(drop=True)
-    print('Combined CSVs: ', df3.shape)
-
-
-    if METHOD == 'GITHUB ACTIONS':
-        # upload to github
-        filename = f"GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
-        df_csv = df3.to_csv()
-        git_file = f"data/processed/twitter/{filename}"
-        print(git_file)
-        # repo.create_file(git_file, message = "committing new file", df_csv, branch="main")
-        
-        repo.update_file(path = consolidated_file_path, message = "Adding new tweets", sha = df_old.sha, branch="main", content = df_csv)
-        print("Done with scraper.py!!!")
-
-        
-    else:
-        # write to csv
-        filename = f"../data/processed/twitter/GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
-
-        if os.path.isfile(filename):
-            df.to_csv(filename, encoding="utf-8", mode="a", header=False, index=False)
-        else:
-            df.to_csv(filename, encoding="utf-8", index=False)
 
 def query_twitter(TW_QUERY, RELEVANT_REGION, START_TIME, END_TIME):
     """
@@ -528,7 +433,7 @@ def batch_scrape():
         time.sleep(1)
 
     ### update scrape info
-    save_results(final_results)
+    return final_results
 
 
 if __name__ == "__main__":
@@ -538,7 +443,62 @@ if __name__ == "__main__":
     ### gen_queries
     # gen_queries()
 
-    ### batch scrape
-    batch_scrape()
+    # determine if script includes parameters or not
+    # total arguments
+    n = len(sys.argv)
+    print("Total arguments passed:", n)
+
+    print("\nArguments passed:", end=" ")
+    for i in range(0, n):
+        print(sys.argv[i], end=" ")
+
+    if n > 1:
+        print("More than 1 parameter passed; Running via Github Actions")
+        API_KEY = os.environ["API_KEY"]
+        API_SECRET_KEY = os.environ["API_SECRET_KEY"]
+        BEARER_TOKEN = os.environ["BEARER_TOKEN"]
+        ACCESS_TOKEN = os.environ["ACCESS_TOKEN"]
+        ACCESS_TOKEN_SECRET = os.environ["ACCESS_TOKEN_SECRET"]
+
+        USERNAME = os.environ["USERNAME"]  # for github api
+        TOKEN = os.environ["TOKEN"]  # for github api
+
+        QUERY_CACHE_FILE = "scraper/querylist.pkl"
+
+    else:
+        print("Less than 1 parameter passed; Running manually ")
+        dotenv.load_dotenv()  # imprt out enviroment variables
+
+        API_KEY = os.environ.get("API_KEY")  # consumer
+        API_SECRET_KEY = os.environ.get("API_SECRET_KEY")  # consumer
+        BEARER_TOKEN = os.environ.get("BEARER_TOKEN")
+
+        ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
+        ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
+
+        QUERY_CACHE_FILE = "querylist.pkl"
+
+        USERNAME = os.environ["USERNAME"]  # for github api
+        TOKEN = os.environ["TOKEN"]  # for github api
+
+    # twitter api
+    client = tw.Client(bearer_token=BEARER_TOKEN)
+    final_results = batch_scrape()
+    df = model.sentiment_model(final_results)  # adding model scores
+    df_new = cleaner.clean_tweets(df)  # post-scraping cleaner
+
+    git_file = 'data/processed/twitter/GVCEH-tweets-combined.csv'
+    if n > 1:
+        scraper_functions.update_file_in_github(USERNAME, TOKEN, git_file, df_new)
+    else:
+        # Save new file locally
+        filename = f"../data/processed/twitter/GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
+
+        if os.path.isfile(filename):
+            df_new.to_csv(filename, encoding="utf-8", mode="a", header=False, index=False)
+        else:
+            df_new.to_csv(filename, encoding="utf-8", index=False)
+
+
 
 
