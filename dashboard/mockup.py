@@ -89,7 +89,6 @@ with sidebar:
 		locations_selected = st.sidebar.multiselect('Select specific location(s):', location_option,
 													default=location_option)
 
-
 	st.sidebar.header('3. Display Top Influencer Tweets')
 	displaytweets_flag = st.sidebar.checkbox('Display tweets by top influencers', value=False)
 
@@ -105,7 +104,8 @@ with sidebar:
 	st.sidebar.download_button(
 		label="Download data as CSV",
 		data=use_df.to_csv().encode('utf-8'),
-		file_name='twitter.csv')
+		file_name='twitter.csv'
+	)
 
 
 with header:
@@ -120,7 +120,7 @@ with header:
 
 	# 1. Graph of tweets per day historically
 	st.subheader('Tweets Per Day')
-	tweets_per_day = use_df.groupby([use_df['created_at'].dt.date]).tweet_id.nunique()
+	tweets_per_day = current_df.groupby([current_df['created_at'].dt.date]).tweet_id.nunique()
 
 	st.download_button(
 		label="Download results as CSV",
@@ -145,7 +145,6 @@ with header:
 	a3.subheader('Top Influencers')
 
 	current_influencers = gvceh.top_influencers(current_df)
-	# st.table(current_influencers)
 	if displaytweets_flag:
 		a3.table(current_df.loc[current_df['username'].isin(current_influencers.iloc[0:5]['username'])][
 					 ['username', 'text']])
@@ -172,15 +171,17 @@ with header:
 
 	# 5. Geolocations
 	st.subheader('Locations')
-	st.write('Sentiment by topic location')
 
 	if locations_selected:
 		current_df = current_df[current_df["search_neighbourhood"].isin(locations_selected)]
-		k = current_df[["search_neighbourhood", "sentiment"]]
-		st.write(k.pivot_table(index='search_neighbourhood',
-								   columns='sentiment',
-								   aggfunc=len,
-								   fill_value=0))
+		if len(current_df) == 0:
+			st.write("No data for the selected aggregation level.")
+		else:
+			k = current_df[["search_neighbourhood", "sentiment"]]
+			st.write(k.pivot_table(index='search_neighbourhood',
+									   columns='sentiment',
+									   aggfunc=len,
+									   fill_value=0))
 
 	elif agg_option == 'Capital Region District (All)':
 		k = current_df[["search_neighbourhood", "sentiment"]]
@@ -192,11 +193,11 @@ with header:
 	else:
 		st.sidebar.error("No options selected. Please select at least one location.")
 
-
-	st.download_button(
-		label="Download results as CSV",
-		data=k_pivot.to_csv().encode('utf-8'),
-		file_name='geolocations.csv')
+	# TODO: this is throwing an error... commenting out for demo
+	# st.download_button(
+	# 	label="Download results as CSV",
+	# 	data=k_pivot.to_csv().encode('utf-8'),
+	# 	file_name='geolocations.csv')
 
 
 
