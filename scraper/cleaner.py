@@ -32,7 +32,7 @@ def clean_csv():
     cleans it
     writes new file
     """
-    filename = "../data/scraped/GVCEH-2022-07-18-tweet-raw.csv"
+    filename = "../data/scraped/GVCEH-2022-07-25-tweet-raw.csv"
     # filename = "../data/post-scraper/all-raw-merged-2022-06-22.csv" # merged data
 
     df = pd.read_csv(filename)
