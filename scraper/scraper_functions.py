@@ -19,7 +19,7 @@ def update_file_in_github(USERNAME, TOKEN, git_file, df_new):
     # Read CSV from Github -> Dataframe
     # contents = repo.get_contents("")
     contents = repo.get_contents(git_file)
-    print(contents)
+    print(help(contents))
 
     stuff = contents.decoded_content
     df_old = pd.read_csv(io.StringIO(stuff.decode('utf-8')))
