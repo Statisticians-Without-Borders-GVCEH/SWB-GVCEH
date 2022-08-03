@@ -490,9 +490,6 @@ if __name__ == "__main__":
 
         QUERY_CACHE_FILE = "querylist.pkl"
 
-        # USERNAME = os.environ["USERNAME"]  # for github api
-        # TOKEN = os.environ["TOKEN"]  # for github api
-
         SEVEN_DAYS = True
 
     # twitter api
@@ -501,8 +498,8 @@ if __name__ == "__main__":
     df = model.sentiment_model(final_results)  # adding model scores
     df_new = cleaner.clean_tweets(final_results)  # post-scraping cleaner
 
-    git_file = "data/processed/twitter/GVCEH-tweets-combined.csv"
     if n > 1:
+        git_file = "data/processed/twitter"
         scraper_functions.update_file_in_github(USERNAME, TOKEN, git_file, df_new)
     else:
         # Save new file locally
