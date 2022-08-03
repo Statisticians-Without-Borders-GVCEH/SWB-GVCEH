@@ -8,7 +8,8 @@ import datetime
 def update_file_in_github(USERNAME, TOKEN, git_file, df_new):
     columns = ["text", "scrape_time", "tweet_id", "created_at", "reply_count", "quote_count",
                "like_count", "retweet_count", "geo_full_name", "geo_id", "username", "num_followers",
-               "search_keywords", "search_neighbourhood", "sentiment", "score"]
+               "search_keywords", "search_neighbourhood"]
+               # "sentiment", "score"]
 
     df_new = df_new[columns]
     print('New Tweets: ', df_new.shape)
