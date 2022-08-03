@@ -3,9 +3,10 @@ import os
 import pickle
 import os.path
 import time
+
 import model  # gvceh functions
 import cleaner  # gvceh functions
-import scraper_functions #gvceh functions
+import scraper_functions  # gvceh functions
 import tweepy as tw
 import pandas as pd
 import sys
@@ -13,11 +14,11 @@ import io
 import requests
 
 from github import Github
+
 from transformers import pipeline
 
 from pprint import pprint
 import dotenv
-
 
 
 ### setting up the config
@@ -33,7 +34,7 @@ NUM_ACCOUNTS_TO_TARGET = 5  ### How many queries we split Appendix B into
 NEIGHBOURHOOD_CHUNKS = 10  ### split neighbourhood into how many chunks ?
 
 
-def query_twitter(TW_QUERY, RELEVANT_REGION, START_TIME, END_TIME):
+def query_twitter(TW_QUERY, RELEVANT_REGION, START_TIME, END_TIME, SEVEN_DAYS=False):
     """
     Run one query against the API and store it
     """
@@ -45,6 +46,10 @@ def query_twitter(TW_QUERY, RELEVANT_REGION, START_TIME, END_TIME):
     #     print(f"Searching for... {search_query}")
     # print("Searching...")
     # print(TW_QUERY)
+
+    if SEVEN_DAYS:
+        START_TIME = None
+        END_TIME = None
 
     # get tweets
     ### limits us last 7 days, need elevated account for longer than that
@@ -110,7 +115,7 @@ def query_twitter(TW_QUERY, RELEVANT_REGION, START_TIME, END_TIME):
                     qt = client.get_tweet(thist.data["id"], tweet_fields=["text"])
 
                     mergetweet = (
-                            newtweet["text"].strip() + " " + qt.data["text"].strip()
+                        newtweet["text"].strip() + " " + qt.data["text"].strip()
                     )
                     mergetweet = mergetweet.replace("\n", "")
 
@@ -167,7 +172,6 @@ def query_twitter(TW_QUERY, RELEVANT_REGION, START_TIME, END_TIME):
         return_data.append(newtweet)
 
     return return_data
-
 
 
 def load_keywords():
@@ -280,7 +284,7 @@ def gen_query_two(SUB_QUERY):
 
 
 def chunker(seq, size):
-    return (seq[pos: pos + size] for pos in range(0, len(seq), size))
+    return (seq[pos : pos + size] for pos in range(0, len(seq), size))
 
 
 def gen_query_three(SUB_QUERY):
@@ -355,7 +359,7 @@ def gen_queries():
         pickle.dump(queries, f)
 
 
-def batch_scrape():
+def batch_scrape(SEVEN_DAYS=False):
     ### open our pickle cache of queries
     # https://stackoverflow.com/questions/25464295/dump-a-list-in-a-pickle-file-and-retrieve-it-back-later
     with open(QUERY_CACHE_FILE, "rb") as f:
@@ -383,7 +387,7 @@ def batch_scrape():
     ### TODO: STORE ON BREAK
     our_queries = query_cache[QUERY_START_AT:]
 
-    dtformat = '%Y-%m-%dT%H:%M:%SZ'
+    dtformat = "%Y-%m-%dT%H:%M:%SZ"
     current_time = datetime.datetime.utcnow()
     start_time = current_time - datetime.timedelta(days=2)
 
@@ -404,13 +408,20 @@ def batch_scrape():
             ### pass to scrape
             ### scrape and save
 
-            data = query_twitter(q[0], q[1], start_time, end_time)
+            data = query_twitter(q[0], q[1], start_time, end_time, SEVEN_DAYS)
 
             num_results += len(data)
 
             ### scave our twitter - only if we got any
             if data:
-                data_cleaned = [{k: v for k, v in d.items() if k not in ('geo_bbox', 'tweet_coordinate')} for d in data]
+                data_cleaned = [
+                    {
+                        k: v
+                        for k, v in d.items()
+                        if k not in ("geo_bbox", "tweet_coordinate")
+                    }
+                    for d in data
+                ]
                 df = pd.DataFrame(data_cleaned)
 
                 if flag == 1:
@@ -419,7 +430,6 @@ def batch_scrape():
 
                 final_results = pd.concat([final_results, df])
                 print(final_results.tail())
-
 
         except Exception as e:
 
@@ -430,7 +440,7 @@ def batch_scrape():
             # input()
             break
 
-        time.sleep(1)
+        time.sleep(2.2)
 
     ### update scrape info
     return final_results
@@ -465,6 +475,8 @@ if __name__ == "__main__":
 
         QUERY_CACHE_FILE = "scraper/querylist.pkl"
 
+        SEVEN_DAYS = False
+
     else:
         print("Less than 1 parameter passed; Running manually ")
         dotenv.load_dotenv()  # imprt out enviroment variables
@@ -478,16 +490,18 @@ if __name__ == "__main__":
 
         QUERY_CACHE_FILE = "querylist.pkl"
 
-        USERNAME = os.environ["USERNAME"]  # for github api
-        TOKEN = os.environ["TOKEN"]  # for github api
+        # USERNAME = os.environ["USERNAME"]  # for github api
+        # TOKEN = os.environ["TOKEN"]  # for github api
+
+        SEVEN_DAYS = True
 
     # twitter api
     client = tw.Client(bearer_token=BEARER_TOKEN)
-    final_results = batch_scrape()
+    final_results = batch_scrape(SEVEN_DAYS)
     df = model.sentiment_model(final_results)  # adding model scores
-    df_new = cleaner.clean_tweets(df)  # post-scraping cleaner
+    df_new = cleaner.clean_tweets(final_results)  # post-scraping cleaner
 
-    git_file = 'data/processed/twitter/GVCEH-tweets-combined.csv'
+    git_file = "data/processed/twitter/GVCEH-tweets-combined.csv"
     if n > 1:
         scraper_functions.update_file_in_github(USERNAME, TOKEN, git_file, df_new)
     else:
@@ -495,10 +509,8 @@ if __name__ == "__main__":
         filename = f"../data/processed/twitter/GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
 
         if os.path.isfile(filename):
-            df_new.to_csv(filename, encoding="utf-8", mode="a", header=False, index=False)
+            df_new.to_csv(
+                filename, encoding="utf-8", mode="a", header=False, index=False
+            )
         else:
             df_new.to_csv(filename, encoding="utf-8", index=False)
-
-
-
-
