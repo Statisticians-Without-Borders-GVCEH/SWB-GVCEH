@@ -12,6 +12,8 @@ def update_file_in_github(USERNAME, TOKEN, git_file, df_new):
                # "sentiment", "score"]
 
     df_new = df_new[columns]
+    df_new['tweet_id']=df_new['tweet_id'].astype(int)
+    
     print('New Tweets: ', df_new.shape)
 
     g = Github(USERNAME, TOKEN)
@@ -35,6 +37,7 @@ def update_file_in_github(USERNAME, TOKEN, git_file, df_new):
     b64_decoded = base64.b64decode(blob.content).decode("utf8")
     df_old = pd.read_csv(io.StringIO(b64_decoded))
     df_old = df_old[columns]
+    df_old['tweet_id']=df_old['tweet_id'].astype(int)
     print('Current CSV: ', df_old.shape)
 
     if last_file_MB > 1:
@@ -50,6 +53,7 @@ def update_file_in_github(USERNAME, TOKEN, git_file, df_new):
         b64_decoded = base64.b64decode(blob.content).decode("utf8")
         df_old = pd.read_csv(io.StringIO(b64_decoded))
         df_old = df_old[columns]
+        df_old['tweet_id']=df_old['tweet_id'].astype(int)
         
         # df_merged = pd.concat([df_old, df_merged]).drop_duplicates(subset='tweet_id', keep=False).reset_index(drop=True)
         df_merged = pd.merge(df_old, df_merged, how='right', on='tweet_id').reset_index(drop=True)
