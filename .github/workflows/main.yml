@@ -1,12 +1,12 @@
   # This is a basic workflow to help you get started with Actions
 
-name: 5 min cron job
+name: Daily cron job
 
        # Controls when the workflow will run
 on:
-  # Triggers the workflow every 15 minutes
+  # Triggers the workflow every day at 8pm PCT (3 UTC)
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "0 3 * * *"
 
      # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
