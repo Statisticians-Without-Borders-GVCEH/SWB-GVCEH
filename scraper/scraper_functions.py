@@ -39,7 +39,7 @@ def update_file_in_github(USERNAME, TOKEN, git_file, df_new):
     df_old = df_old[columns]
     print('Current CSV: ', df_old.shape)
 
-    if last_file_MB > 1:
+    if last_file_MB > 5:
         print("Latest file size exceeds limit - creating new csv...")
 
         # dedupe new data against last file in repo; don't keep any duplicates
