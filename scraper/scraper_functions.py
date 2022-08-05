@@ -48,7 +48,8 @@ def update_file_in_github(USERNAME, TOKEN, git_file, df_new):
 
         # dedupe new data against last file in repo; don't keep any duplicates
         # df_merged = pd.concat([df_old, df_new]).drop_duplicates(subset='tweet_id', keep=False).reset_index(drop=True)
-        df_merged = pd.merge(df_old, df_new, how='right', on='tweet_id').reset_index(drop=True)
+        different_cols = df_new.columns.difference(df_old.columns)
+        df_merged = pd.merge(df_old, df_new[different_cols], how='right', on='tweet_id').reset_index(drop=True)
 
         # dedupe new data against second to last file in repo; don't keep any duplicates
         contents = repo.get_contents(second_to_last_file.path)
@@ -62,7 +63,8 @@ def update_file_in_github(USERNAME, TOKEN, git_file, df_new):
         print('Current CSV after invalid rows: ', df_old.shape)
         
         # df_merged = pd.concat([df_old, df_merged]).drop_duplicates(subset='tweet_id', keep=False).reset_index(drop=True)
-        df_merged = pd.merge(df_old, df_merged, how='right', on='tweet_id').reset_index(drop=True)
+        different_cols = df_new.columns.difference(df_old.columns)
+        df_merged = pd.merge(df_old, df_merged[different_cols], how='right', on='tweet_id').reset_index(drop=True)
         
         print('New Unique Tweets: ', df_merged.shape)
 
