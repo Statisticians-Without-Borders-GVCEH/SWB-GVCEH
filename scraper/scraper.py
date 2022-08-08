@@ -495,7 +495,7 @@ if __name__ == "__main__":
     # twitter api
     client = tw.Client(bearer_token=BEARER_TOKEN)
     final_results = batch_scrape(SEVEN_DAYS)
-    df = model.sentiment_model(final_results)  # adding model scores
+    final_results = model.sentiment_model(final_results)  # adding model scores
     df_new = cleaner.clean_tweets(final_results)  # post-scraping cleaner
 
     if n > 1:
