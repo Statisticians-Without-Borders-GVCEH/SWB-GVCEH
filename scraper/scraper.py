@@ -499,7 +499,7 @@ if __name__ == "__main__":
     df_new = cleaner.clean_tweets(final_results)  # post-scraping cleaner
 
     if n > 1:
-        git_file = "data/processed/twitter"
+        git_file = "data/processed/twitter/github_actions"
         scraper_functions.update_file_in_github(USERNAME, TOKEN, git_file, df_new)
     else:
         # Save new file locally
