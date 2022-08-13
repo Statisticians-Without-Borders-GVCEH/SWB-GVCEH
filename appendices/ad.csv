@@ -1,40 +1,29 @@
 ﻿,sectors
-0,Encampment
-1,Low income
-2, low-income
-3,Emergency Housing 
-4,Affordable Housing 
-5,Subsidized Housing 
-6,Peer Housing Support 
-7,Peer Housing Support Program 
-8,Lived Experience 
-9,People with lived experience 
-10,Person experiencing homelessness 
-11,Community Plan to End Homelessness 
-12,Coordinated Access and Assessment 
-13,Reaching Home 
-14,Point in Time
-15, PiT Count
-16, PiT 
-17,Harm Reduction 
-18,Safe Supply 
-19,Service provider 
-20,Frontline
-21,front line
-22, frontline worker
-23, front line worker 
-24,Frontline
-25,front line
-26, frontline worker
-27, front line worker 
-28,Frontline
-29,front line
-30, frontline worker
-31, front line worker 
-32,Frontline
-33,front line
-34, frontline worker
-35, front line worker 
-36,Healthcare 
-37,Complex care 
-38,Temporary shelter 
+0,Affordable Housing
+1,Community Plan to End Homelessness 
+2,Complex care 
+3,Coordinated Access and Assessment 
+4,couch surfing
+5,Emergency Housing 
+6,Encampment
+7,Encampments
+8,Front Line
+9,Front Line Worker
+10,Harm Reduction
+11,Health care
+12,Lived Experience
+13,low income
+14,Peer Housing Support
+15,Peer Housing Support Program
+16,People with lived experience
+17,Person experiencing homelessness 
+18,PiT
+19,PiT Count
+20,Point in Time
+21,Reaching Home 
+22,Safe Supply 
+23,Service provider 
+24,Subsidized Housing 
+25,Temporary housing 
+26,Temporary shelter
+27,Tiny Town

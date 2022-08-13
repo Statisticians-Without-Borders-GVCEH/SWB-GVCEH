@@ -1,42 +1,39 @@
 ,word
-0,Poverty 
-1,Poor 
-2,Crime 
-3,Violence 
-4,Thief 
-5,Theft 
-6,Stolen 
-7,Encampment 
-8,Camp 
-9,Camper 
-10,Tent 
-11,Shelter 
-12,Housing 
-13,Low-income 
-14,Homeless 
-15,Homelessness 
-16,Camper 
-17,Camping 
-18,Tent 
-19,Unhoused 
-20,Affordable 
-21,Affordable housing 
-22,Substance use 
-23,Addict
-24,Addicted 
-25,Drugs 
-26,Evicted
-27,Eviction
-28,Evict 
-29,Narcotics 
-30,Alcoholic 
-31,Drugs
-32,drug use 
-33,Social Housing 
-34,PovertyPimps 
-35,Collude
-36,Collusion 
-37,Overdose
-38,overdosed 
-39,Social structure 
-40,Social problem 
+0,#PovertyPimps
+1,Addict
+2,Addicted
+3,Affordable
+4,Affordable housing 
+5,Alcoholic 
+6,Camp
+7,Camper
+8,Camping
+9,Collude
+10,Collusion
+11,Crime 
+12,Drugs
+13,Drugs
+14,Drug Use
+15,Evicted
+16,Evicition
+17,Evict
+18,Home
+19,Homeless
+20,Homelessness 
+21,Housing
+22,Narcotics 
+23,Overdose
+24,Overdosed
+25,Poor 
+26,Poverty
+27,Shelter
+28,Social Housing 
+29,Social problem 
+30,Social structure 
+31,Stolen
+32,Substance use
+33,Tent
+34,Theft
+35,Thief
+36,Unhoused 
+37,Violence
