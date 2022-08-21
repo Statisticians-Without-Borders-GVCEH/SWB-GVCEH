@@ -60,7 +60,7 @@ def update_file_in_github(USERNAME, TOKEN, git_file, df_new):
         print('New Unique Tweets: ', df_merged.shape)
 
         df_csv = df_merged.to_csv()
-        new_file = f'data/processed/twitter/GVCEH-tweets-combined_{str(datetime.date.today())}.csv'
+        new_file = f'data/processed/twitter/github_actions/GVCEH-tweets-combined_{str(datetime.date.today())}.csv'
         repo.create_file(path=new_file, message="Creating new csv", branch="main", content=df_csv)
         print(f"{new_file} created in Github")
 
