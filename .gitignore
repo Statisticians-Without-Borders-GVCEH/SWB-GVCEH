@@ -130,3 +130,7 @@ dmypy.json
 
 # Sharepoint credentials json
 sharepoint_cred.json
+
+# Mac files
+**/.DS_Store
+

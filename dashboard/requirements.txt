@@ -1,7 +1,0 @@
-pandas
-numpy
-streamlit==1.8.1
-plotly==5.7.0
-pydeck==0.7.1
-
-
