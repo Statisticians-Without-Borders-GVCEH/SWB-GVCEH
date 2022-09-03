@@ -2,6 +2,7 @@
 from datetime import date, datetime, timedelta, time
 import pandas as pd
 import numpy as np
+import glob
 
 def get_seed():
     ''' Input the influencer file and add a boolean influencer column to the dataframes.
@@ -10,8 +11,12 @@ def get_seed():
     # reddit_df = pd.read_csv('./data/processed/reddit_antiwork.csv',
     # 	parse_dates=['timestamp'], dtype={'created': object, 'score': float})
 
-    twitter_df = pd.read_csv('./data/all-raw-merged-2022-06-22_DEMO.csv',
-        parse_dates=['created_at'], dtype={'tweet_id': object})
+    directory = './data/processed/twitter/github_actions/'
+
+    # twitter_df = pd.read_csv('./data/all-raw-merged-2022-06-22_DEMO.csv',
+    #     parse_dates=['created_at'], dtype={'tweet_id': object})
+
+    twitter_df = pd.concat([ pd.read_csv(f, parse_dates=['created_at'], dtype={'tweet_id': object}) for f in [i for i in glob.iglob(f'{directory}/*')] ])
 
     # next two lines should be part of post scrape clean-up
     influencer_list = list(pd.read_csv('./dashboard/influencers.csv')['handle'])
