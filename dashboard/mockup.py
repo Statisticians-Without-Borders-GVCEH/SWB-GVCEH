@@ -68,11 +68,11 @@ with sidebar:
 	priorperiod_flag = st.sidebar.checkbox(
 	        "Prior period comparison", value=False, help=readme['langford']
 	    )
-	
+
 	if priorperiod_flag:
 		prior_start_date, prior_end_date = gvceh.get_prior_period(start_date, end_date)
 		st.sidebar.write('Prior period is from', prior_start_date, 'to', prior_end_date)
-		
+
 
 	st.sidebar.header('2. Locations')
 
@@ -118,6 +118,20 @@ with header:
 	### get a better image after fixing the rest of the layout
 	a2.image(image)
 
+	st.subheader('Summary')
+	kpi1, kpi2, kpi3 = st.columns(3)
+	if priorperiod_flag:
+		kpi1.metric(label = "Total Tweets", value= f"{current_df['tweet_id'].nunique():,}", delta = f"{current_df['tweet_id'].nunique() - prior_df['tweet_id'].nunique():,}")
+		kpi2.metric(label="Unique Users", value= f"{current_df['username'].nunique():,}", delta = f"{current_df['username'].nunique() - prior_df['username'].nunique():,}")
+		kpi3.metric(label="Unique Locations", value= f"{current_df['search_neighbourhood'].nunique():,}", delta = f"{current_df['search_neighbourhood'].nunique() - prior_df['search_neighbourhood'].nunique():,}")
+	else:
+		kpi1.metric(label = "Total Tweets", value= f"{current_df['tweet_id'].nunique():,}")
+		kpi2.metric(label="Unique Users", value= f"{current_df['username'].nunique():,}")
+		kpi3.metric(label="Unique Locations", value= f"{current_df['search_neighbourhood'].nunique():,}")
+
+
+
+
 	# 1. Graph of tweets per day historically
 	st.subheader('Tweets Per Day')
 	tweets_per_day = current_df.groupby([current_df['created_at'].dt.date]).tweet_id.nunique()
@@ -132,7 +146,7 @@ with header:
 	fig_0.update_traces(line_color='#BF4C41')
 	st.plotly_chart(fig_0, use_container_width=True)
 
-	
+
 	# whitespace
 	n = 0
 	while n < 4:
@@ -143,7 +157,7 @@ with header:
 
 	# 2. Top Influencers
 	a3.subheader('Top Influencers')
-
+	a3.write('TODO: Add description of top influencer logic and limit to top 10(?) results for table.')
 	current_influencers = gvceh.top_influencers(current_df)
 	if displaytweets_flag:
 		a3.table(current_df.loc[current_df['username'].isin(current_influencers.iloc[0:5]['username'])][
@@ -166,7 +180,7 @@ with header:
 	# 4. Viewing a random sample of tweets for sentiment categories
 	st.subheader('Sample of Tweets' if option == 'Twitter' else 'Sample of Posts')
 	choice = st.selectbox('Choose a sentiment', ['Negative', 'Neutral', 'Positive'])
-	st.table((current_df.loc[current_df.sentiment == choice].sample(n=5))[['username', 'text', 'sentiment', 'keywords', 'search_neighbourhood']])
+	st.table((current_df.loc[current_df.sentiment == choice].sample(n=5))[['username', 'text', 'sentiment', 'search_keywords', 'search_neighbourhood']])
 
 
 	# 5. Geolocations
@@ -175,20 +189,24 @@ with header:
 	if locations_selected:
 		current_df = current_df[current_df["search_neighbourhood"].isin(locations_selected)]
 		if len(current_df) == 0:
-			st.write("No data for the selected aggregation level.")
+			st.write("No data for the selected location category.")
 		else:
 			k = current_df[["search_neighbourhood", "sentiment"]]
 			st.write(k.pivot_table(index='search_neighbourhood',
 									   columns='sentiment',
 									   aggfunc=len,
-									   fill_value=0))
+									   fill_value=0,
+								   	   margins = True,
+								       margins_name='Total'))
 
 	elif agg_option == 'Capital Region District (All)':
 		k = current_df[["search_neighbourhood", "sentiment"]]
 		k_pivot = k.pivot_table(index='search_neighbourhood',
 									columns='sentiment',
 									aggfunc=len,
-									fill_value=0)
+									fill_value=0,
+								    margins = True,
+								    margins_name='Total')
 		st.write(k_pivot)
 	else:
 		st.sidebar.error("No options selected. Please select at least one location.")

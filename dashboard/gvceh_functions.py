@@ -2,6 +2,7 @@
 from datetime import date, datetime, timedelta, time
 import pandas as pd
 import numpy as np
+import os
 
 def get_seed():
     ''' Input the influencer file and add a boolean influencer column to the dataframes.
@@ -10,12 +11,28 @@ def get_seed():
     # reddit_df = pd.read_csv('./data/processed/reddit_antiwork.csv',
     # 	parse_dates=['timestamp'], dtype={'created': object, 'score': float})
 
-    twitter_df = pd.read_csv('./data/all-raw-merged-2022-06-22_DEMO.csv',
-        parse_dates=['created_at'], dtype={'tweet_id': object})
+    # twitter_df = pd.read_csv('./data/all-raw-merged-2022-06-22_DEMO.csv',
+    #     parse_dates=['created_at'], dtype={'tweet_id': object})
+
+    twitter_df = pd.DataFrame([])
+    for subdir, dirs, files in os.walk('./data/processed/twitter/github_actions/'):
+        for file in files:
+            file_path = os.path.join(subdir, file)
+            if file_path[-4:] == '.csv':
+                # print(file_path)
+                df = pd.read_csv(
+                    file_path,
+                    parse_dates=['created_at'],
+                    dtype={'tweet_id': object},
+                    usecols=["text", "scrape_time", "tweet_id", "created_at", "reply_count", "quote_count",
+                             "like_count", "retweet_count", "geo_full_name", "geo_id", "username", "num_followers",
+                             "search_keywords", "search_neighbourhood", "sentiment", "score"]
+                )
+                twitter_df = pd.concat([df, twitter_df])
+
 
     # next two lines should be part of post scrape clean-up
     influencer_list = list(pd.read_csv('./dashboard/influencers.csv')['handle'])
-
     twitter_df['influencer_flag'] = twitter_df['username'].apply(lambda x: 1 if x in influencer_list else 0)
 
     return twitter_df#, reddit_df
