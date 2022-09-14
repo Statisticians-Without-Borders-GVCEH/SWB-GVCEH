@@ -50,6 +50,8 @@ with sidebar:
 	st.sidebar.header('1. Date Range')
 	scol1, scol2 = st.sidebar.columns(2)
 
+	st.write(use_df['created_at'].min())
+
 	start_date = scol1.date_input(
 			"Start Date",
 			value=use_df['created_at'].min().date(),

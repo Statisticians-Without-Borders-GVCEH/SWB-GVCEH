@@ -16,7 +16,8 @@ def get_seed():
     # twitter_df = pd.read_csv('./data/all-raw-merged-2022-06-22_DEMO.csv',
     #     parse_dates=['created_at'], dtype={'tweet_id': object})
 
-    twitter_df = pd.concat([ pd.read_csv(f, parse_dates=['created_at'], dtype={'tweet_id': object}) for f in [i for i in glob.iglob(f'{directory}/*')] ])
+    twitter_df = pd.concat([ pd.read_csv(f, parse_dates=['created_at'], dtype={'tweet_id': object}) for f in [i for i in glob.iglob(f'{directory}/*')] ], ignore_index=True).drop_duplicates(subset=['tweet_id'])
+    # twitter_df['created_at'] = pd.to_datetime(twitter_df['created_at'], utc=True)
 
     # next two lines should be part of post scrape clean-up
     influencer_list = list(pd.read_csv('./dashboard/influencers.csv')['handle'])
