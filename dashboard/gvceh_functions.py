@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import os
 
+
 def get_seed():
     ''' Input the influencer file and add a boolean influencer column to the dataframes.
     Specify the twitter source in src.'''
@@ -35,7 +36,8 @@ def get_seed():
     influencer_list = list(pd.read_csv('./dashboard/influencers.csv')['handle'])
     twitter_df['influencer_flag'] = twitter_df['username'].apply(lambda x: 1 if x in influencer_list else 0)
 
-    return twitter_df#, reddit_df
+    return twitter_df
+    # return twitter_df, reddit_df
 
 
 def get_data():
@@ -50,15 +52,17 @@ def get_data():
     # twitter_df = pd.read_csv('./twitter/demo/GVCEH-2022-04-11-tweet-raw-sentiment.csv',
     # 	parse_dates=['created_at'], dtype={'tweet_id': object})
 
-    return {'Twitter': twitter_df}#, 'Reddit': reddit_df}
+    return {'Twitter': twitter_df}
+    # return {'Twitter': twitter_df, 'Reddit': reddit_df}
 
 
 def tooltips():
     ''' A dictionary of tooltips.'''
     readme = {}
-    readme['saanich'] = 'Would you like to see an analysis for Twitter or Reddit?'
-    readme['langford'] = 'Would you like to see a prior period comparison? This depends on the date range selected i.e. a prior period comparison for 4/10/22 - 4/16/22 would be 4/3/22 - 4/9/22.'
-
+    readme['data_source'] = 'Would you like to see an analysis for Twitter or Reddit?'
+    readme['prior_period'] = 'A prior period comparison enables comparison of results for this period against the previous period. e.g. the prior period for 4/10/22 - 4/16/22 would be 4/3/22 - 4/9/22.'
+    readme['top_influencers'] = 'The top influencers for a time period are calculated using a weighted measure of number of tweets, reply and retweet count, like count, number of followers and an influencer flag based on the appendix.'
+    
     return readme
 
 
@@ -88,7 +92,6 @@ def get_frames(start, end, df):
     prior = df.loc[(df.created_at >= datetime.combine(prev_start, time())) &
                    (df.created_at <= datetime.combine(prev_end, time()))]
 
-
     return current, prior
 
 
@@ -109,7 +112,6 @@ def agg_sentiments_by_category(cdf, pdf):
     return by_category
 
 # test: 02_test_sentiment_agg
-
 
 
 def top_influencers(cdf):
@@ -138,17 +140,4 @@ def get_appendix_a_locations():
 #                          right_on='Appendix A Location', how='inner')
 
 def get_locations(appendix_df, agg_option):
-    # df = pd.read_csv('./appendices/aa.csv')
     return appendix_df.loc[appendix_df["Category"] == agg_option, "Location"].tolist()
-
-
-# def agg_tweets_by_users(cdf, pdf):
-# 	''' Aggregating number of tweets by username.'''
-
-# 	cagg = pd.DataFrame(cdf['name'].value_counts(sort=True))
-
-# 	pagg = pd.DataFrame(pdf['name'].value_counts(sort=True))
-# 	pagg.columns = ['Prior']
-
-# 	influencers = cagg.join(pagg).reset_index
-# 	influencers.columns['Number of Tweets', 'Current', '']
