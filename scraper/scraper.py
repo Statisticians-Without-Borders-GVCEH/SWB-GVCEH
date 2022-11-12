@@ -14,7 +14,7 @@ import io
 
 from github import Github
 
-#from transformers import pipeline
+from transformers import pipeline
 
 from pprint import pprint
 import dotenv
