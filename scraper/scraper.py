@@ -14,7 +14,7 @@ import io
 
 from github import Github
 
-from transformers import pipeline
+#from transformers import pipeline
 
 from pprint import pprint
 import dotenv
@@ -150,6 +150,9 @@ def query_twitter(TW_QUERY, RELEVANT_REGION, START_TIME, END_TIME, SEVEN_DAYS=Fa
         # poster
         newtweet["username"] = user.username
 
+        ### user profile location
+        newtweet["user_location"] = user.location
+
         # number of followers
         newtweet["num_followers"] = user.public_metrics["followers_count"]
 
@@ -245,7 +248,7 @@ def batch_scrape(SEVEN_DAYS=False):
             # input()
             break
 
-        time.sleep(2.1)
+        time.sleep(2.5)
 
     ### update scrape info
     return final_results
@@ -297,7 +300,9 @@ if __name__ == "__main__":
     # twitter api
     client = tw.Client(bearer_token=BEARER_TOKEN)
     final_results = batch_scrape(SEVEN_DAYS)
-    final_results = model.sentiment_model(final_results)  # adding model scores
+    if n > 1:
+        ### Don't have CUDA installed, can't run the model
+        final_results = model.sentiment_model(final_results)  # adding model scores
     df_new = cleaner.clean_tweets(final_results)  # post-scraping cleaner
 
     if n > 1:
