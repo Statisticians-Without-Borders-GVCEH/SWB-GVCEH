@@ -6,7 +6,8 @@ name: Daily cron job
 on:
   # Triggers the workflow every day at 8pm PCT (3 UTC)
   schedule:
-    - cron: "0 3 * * *"
+    - cron: "*/5 * * * *" # runs every 5 minutes 
+    # - cron: "0 3 * * *"
 
      # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -15,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout repo content
-        uses: actions/checkout@v2 # checkout the repository content to github runner.
+        uses: actions/checkout@v3 # checkout the repository content to github runner.
       - name: setup python
         uses: actions/setup-python@v2
         with:
