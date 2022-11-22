@@ -41,6 +41,7 @@ jobs:
           pip install PyGithub
           pip install tensorflow
           pip install transformers
+          pip import keras
           python scraper/scraper.py github_actions
 
 
