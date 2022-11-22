@@ -39,9 +39,8 @@ jobs:
           pip install tweepy
           pip install requests
           pip install PyGithub
-          pip install tensorflow
+          pip install tensorflow==2.9
           pip install transformers
-          pip install keras
           python scraper/scraper.py github_actions
 
 
