@@ -7,6 +7,7 @@ on:
   # Triggers the workflow every day at 8pm PCT (3 UTC)
   schedule:
     - cron: "0 3 * * *"
+    # - cron: "*/5 * * * *" # runs every 5 minutes
 
      # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -15,9 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout repo content
-        uses: actions/checkout@v2 # checkout the repository content to github runner.
+        uses: actions/checkout@v3 # checkout the repository content to github runner.
       - name: setup python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8 #install the python needed
       - name: execute scraper.py 
@@ -38,7 +39,7 @@ jobs:
           pip install tweepy
           pip install requests
           pip install PyGithub
-          pip install tensorflow
+          pip install tensorflow==2.9
           pip install transformers
           python scraper/scraper.py github_actions
 
