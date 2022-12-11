@@ -2,7 +2,7 @@ import pickle
 
 import pandas as pd
 
-SUB_QUERY_CHUNKS = 10  ### how many queries we split Appendix C + E + D into
+SUB_QUERY_CHUNKS = 17  ### how many queries we split Appendix C + E + D into
 NEIGHBOURHOOD_CHUNKS = 10  ### split neighbourhood into how many chunks ?
 NUM_ACCOUNTS_TO_TARGET = 5  ### How many queries we split Appendix B into
 
