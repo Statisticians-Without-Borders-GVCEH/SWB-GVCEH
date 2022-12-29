@@ -216,7 +216,9 @@ def batch_scrape(SEVEN_DAYS=False):
             ### pass to scrape
             ### scrape and save
 
-            data = query_twitter(q[0], q[1], start_time, end_time, SEVEN_DAYS)
+            this_query = q[0].replace("&", "")
+
+            data = query_twitter(this_query, q[1], start_time, end_time, SEVEN_DAYS)
 
             num_results += len(data)
 
@@ -243,6 +245,7 @@ def batch_scrape(SEVEN_DAYS=False):
 
             print("Broke on...")
             print(f"Query # {num_queries}")
+            print(q[0])
             print(f"Returned {num_results} tweets")
             print(str(e))
             # input()
