@@ -28,15 +28,16 @@ def clean_csv():
     cleans it
     writes new file
     """
-    filename = "../data/scraped/GVCEH-2022-07-25-tweet-raw.csv"
-    # filename = "../data/post-scraper/all-raw-merged-2022-06-22.csv" # merged data
+    filename = "../data/processed/twitter/GVCEH-2022-12-29-tweet-scored.csv"
 
     df = pd.read_csv(filename)
 
+    print(len(df))
     df = clean_tweets(df)
 
-    newname = filename.replace("raw", "cleaned")
-    newname = newname.replace("scraped", "cleaned")
+    #newname = filename.replace("raw", "cleaned")
+    #newname = newname.replace("scraped", "cleaned")
+    newname = filename.replace("scored", "fixed")
 
     ### being lazy and just overwriting
     # newname = "../data/cleaned/all-cleaned-merged-2022-06-22.csv" # for merged data
@@ -45,6 +46,8 @@ def clean_csv():
     # twitter_influencer_list = list(pd.read_csv('./dashboard/influencers.csv')['handle'])
     # df['influencer_flag'] = df['username'].apply(lambda x: 1 if x in twitter_influencer_list else 0)
 
+    print(len(df))
+    print(newname)
     df.to_csv(newname)
 
 

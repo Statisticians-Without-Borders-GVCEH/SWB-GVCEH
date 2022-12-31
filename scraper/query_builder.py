@@ -188,6 +188,9 @@ def gen_queries():
     ### combine
     queries = q1 + q2 + q3 + q4
 
+    ### remove forbidden characters
+    queries = [q.replace("&", "") for q in queries]
+
     print(f"Total # of queries: {len(queries)}")
     # print(f"Will take {len(queries) / MAX_PER_15} attempts")
     print(f"Will take minimum {(len(queries)*2.1)/60} minutes")
