@@ -305,7 +305,17 @@ if __name__ == "__main__":
     final_results = batch_scrape(SEVEN_DAYS)
     if n > 1:
         ### Don't have CUDA installed, can't run the model
-        final_results = model.sentiment_model(final_results)  # adding model scores
+        print("============================================================================")
+        print("============================================================================")
+
+        final_results = model.sentiment_model(final_results)  # adding sentiment model scores
+        print(f"Pre relevancy filter: {len(final_results)}")
+        final_results = model.relevance_model(final_results)    # filters out irrelevant tweets
+        print(f"Relevancy filter applied: {len(final_results)}")
+
+        print("============================================================================")
+        print("============================================================================")
+
     df_new = cleaner.clean_tweets(final_results)  # post-scraping cleaner
 
     if n > 1:

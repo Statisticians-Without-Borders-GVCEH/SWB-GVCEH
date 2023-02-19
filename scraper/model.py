@@ -1,4 +1,5 @@
 from transformers import pipeline
+from setfit import SetFitModel
 
 def sentiment_model(df):
     # create the model
@@ -17,4 +18,13 @@ def sentiment_model(df):
 
     df['sentiment'] = all_sentiments
     df['score'] = all_scores
+    return df
+
+def relevance_model(df):
+    # create the model
+    model = SetFitModel.from_pretrained("sheesh021/gvceh-setfit-rel-model2")
+    all_text = df.text
+    all_results = model(list(all_text))
+    all_results = all_results.numpy()
+    df = df[all_results == 1]  # filters out non-relevant tweets
     return df
