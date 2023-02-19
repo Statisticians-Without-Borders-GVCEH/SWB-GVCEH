@@ -6,8 +6,8 @@ name: Daily cron job
 on:
   # Triggers the workflow every day at 8pm PCT (3 UTC)
   schedule:
-    - cron: "0 3 * * *"
-    # - cron: "*/5 * * * *" # runs every 5 minutes
+    # - cron: "0 3 * * *"
+    - cron: "*/5 * * * *" # runs every 5 minutes
 
      # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -41,6 +41,7 @@ jobs:
           pip install PyGithub
           pip install tensorflow==2.9
           pip install transformers
+          pip install setfit
           python scraper/scraper.py github_actions
 
 
