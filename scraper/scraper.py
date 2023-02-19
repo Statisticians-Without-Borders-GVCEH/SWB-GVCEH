@@ -303,20 +303,22 @@ if __name__ == "__main__":
     # twitter api
     client = tw.Client(bearer_token=BEARER_TOKEN)
     final_results = batch_scrape(SEVEN_DAYS)
+
+    final_results = cleaner.clean_tweets(final_results)  # post-scraping cleaner
+
     if n > 1:
         ### Don't have CUDA installed, can't run the model
         print("============================================================================")
         print("============================================================================")
 
-        final_results = model.sentiment_model(final_results)  # adding sentiment model scores
         print(f"Pre relevancy filter: {len(final_results)}")
         final_results = model.relevance_model(final_results)    # filters out irrelevant tweets
         print(f"Relevancy filter applied: {len(final_results)}")
+        final_results = model.sentiment_model(final_results)  # adding sentiment model scores
 
         print("============================================================================")
         print("============================================================================")
 
-    df_new = cleaner.clean_tweets(final_results)  # post-scraping cleaner
 
     if n > 1:
         git_file = "data/processed/twitter/github_actions"
