@@ -322,14 +322,14 @@ if __name__ == "__main__":
 
     if n > 1:
         git_file = "data/processed/twitter/github_actions"
-        scraper_functions.update_file_in_github(USERNAME, TOKEN, git_file, df_new)
+        scraper_functions.update_file_in_github(USERNAME, TOKEN, git_file, final_results)
     else:
         # Save new file locally
         filename = f"../data/processed/twitter/GVCEH-{str(datetime.date.today())}-tweet-scored.csv"
 
         if os.path.isfile(filename):
-            df_new.to_csv(
+            final_results.to_csv(
                 filename, encoding="utf-8", mode="a", header=False, index=False
             )
         else:
-            df_new.to_csv(filename, encoding="utf-8", index=False)
+            final_results.to_csv(filename, encoding="utf-8", index=False)
