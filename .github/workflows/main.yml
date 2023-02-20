@@ -41,6 +41,7 @@ jobs:
           pip install PyGithub
           pip install tensorflow==2.9
           pip install transformers
+          pip install setfit
           python scraper/scraper.py github_actions
 
 
