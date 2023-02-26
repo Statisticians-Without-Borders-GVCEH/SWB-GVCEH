@@ -31,7 +31,7 @@ def get_seed():
                 )
                 twitter_df = pd.concat([df, twitter_df])
 
-
+    twitter_df.reset_index(inplace=True, drop=True)
     # next two lines should be part of post scrape clean-up
     influencer_list = list(pd.read_csv('./dashboard/influencers.csv')['handle'])
     twitter_df['influencer_flag'] = twitter_df['username'].apply(lambda x: 1 if x in influencer_list else 0)
