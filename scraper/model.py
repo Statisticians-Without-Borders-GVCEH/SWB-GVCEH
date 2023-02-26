@@ -24,7 +24,7 @@ def sentiment_model(df):
 
 def relevance_model(df):
     # create the model
-    model = SetFitModel.from_pretrained("sheesh021/gvceh-setfit-rel-model2")
+    model = SetFitModel.from_pretrained("sheilaflood/gvceh-setfit-rel-model2")
     all_text = df.text
     all_results = model(list(all_text))
     all_results = all_results.numpy()
