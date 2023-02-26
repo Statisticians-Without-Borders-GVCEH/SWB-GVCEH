@@ -6,7 +6,7 @@ name: Daily cron job
 on:
   # Triggers the workflow every day at 8pm PCT (3 UTC)
   schedule:
-    - cron: "0 4 * * *"
+    - cron: "0 3 * * *"
     # - cron: "*/5 * * * *" # runs every 5 minutes
 
      # A workflow run is made up of one or more jobs that can run sequentially or in parallel
