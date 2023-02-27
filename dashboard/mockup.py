@@ -110,7 +110,8 @@ with header:
 	a1, a2 = st.columns([2, 1])
 	a1.title('Homelessness in Greater Victoria')
 	a1.markdown('''This dashboard gives a sense of the sentiment around homelessness in the Greater Victoria area. 
-	Data is collected from Twitter daily and stored in GitHub.''')
+	Data is collected from Twitter daily and a relevancy model actively filters out irrelevant tweets. Further 
+	documentation and source code can be found at: https://github.com/Statisticians-Without-Borders-GVCEH/SWB-GVCEH''')
 	a2.image(image)
 
 	st.subheader('Summary')
