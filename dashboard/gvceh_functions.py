@@ -99,6 +99,10 @@ def agg_sentiments_by_category(cdf, pdf):
     ''' Aggregating number of sentiments by category and
 	generating a single dataframe with current and prior period aggregations.'''
 
+    # capitalize only the first letter in the string (e.g., negative -> Negative)
+    cdf['sentiment'] = cdf['sentiment'].map(str.title)
+    pdf['sentiment'] = pdf['sentiment'].map(str.title)
+
     cagg = pd.DataFrame(cdf['sentiment'].value_counts())
 
     pagg = pd.DataFrame(pdf['sentiment'].value_counts())
