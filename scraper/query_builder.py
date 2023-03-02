@@ -2,9 +2,9 @@ import pickle
 
 import pandas as pd
 
-SUB_QUERY_CHUNKS = 17  ### how many queries we split Appendix C + E + D into
+SUB_QUERY_CHUNKS = 18  ### how many queries we split Appendix C + E + D into
 NEIGHBOURHOOD_CHUNKS = 10  ### split neighbourhood into how many chunks ?
-NUM_ACCOUNTS_TO_TARGET = 5  ### How many queries we split Appendix B into
+NUM_ACCOUNTS_TO_TARGET = 6  ### How many queries we split Appendix B into
 
 QUERY_MAX_LENGTH = 512
 
@@ -188,12 +188,15 @@ def gen_queries():
     ### combine
     queries = q1 + q2 + q3 + q4
 
+    nun = 0
     ### remove forbidden characters
-    queries = [q.replace("&", "") for q in queries]
+    # this stopped working... it's should only apply this function
+    # on the 0th item in the tuple, but the scraper does this
+    #queries = [q.replace("&", "") for q in queries]
 
     print(f"Total # of queries: {len(queries)}")
     # print(f"Will take {len(queries) / MAX_PER_15} attempts")
-    print(f"Will take minimum {(len(queries)*2.1)/60} minutes")
+    print(f"Will take minimum {(len(queries)*2.5)/60} minutes")
 
     # cache queries
     print("Writing...")
