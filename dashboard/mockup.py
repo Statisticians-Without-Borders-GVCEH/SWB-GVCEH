@@ -76,23 +76,35 @@ with sidebar:
 	displaytweets_flag = st.sidebar.checkbox('Display tweets by top influencers', value=False, help=readme['top_influencers'])
 
 
-	st.sidebar.header('3. Locations')
+	st.sidebar.header('3. User Search Options')
+	flag1, flag2 = st.sidebar.columns(2)
+	influencer_flag = flag1.checkbox('Influencers', value=False)
+	organization_flag = flag2.checkbox('Organizations', value=False)
 
-	appendix_a = gvceh.get_appendix_a_locations()
-	appendix_a_categories = appendix_a["Category"].unique()
-	list2 = appendix_a_categories.tolist()
-	list1 = ["Capital Region District (All)"]
-	agg_levels = list1 + list2
+	if influencer_flag == False and organization_flag == False:
+		options_selected = []
+	elif influencer_flag and organization_flag:
+		appendix_ab_persons = pd.read_csv('./appendices/abpersons.csv')
+		appendix_ab_persons = appendix_ab_persons["Influencers"].str.strip().unique()
+		appendix_ab_persons = appendix_ab_persons.tolist()
+		appendix_ab_orgs = pd.read_csv('./appendices/aborganizations.csv')
+		appendix_ab_orgs = appendix_ab_orgs["Organizations"].str.strip().unique()
+		appendix_ab_orgs = appendix_ab_orgs.tolist()
+		ab_options_cat = appendix_ab_persons + appendix_ab_orgs
+		options_selected = st.sidebar.multiselect('Select specific influencers/organizations:', ab_options_cat)
+	elif influencer_flag:
+		appendix_ab_persons = pd.read_csv('./appendices/abpersons.csv')
+		ab_options_cat = appendix_ab_persons["Influencers"].str.strip().unique()
+		options_selected = st.sidebar.multiselect('Select specific influencers:', ab_options_cat)
+	elif organization_flag:
+		appendix_ab_orgs = pd.read_csv('./appendices/aborganizations.csv')
+		ab_options_cat = appendix_ab_orgs["Organizations"].str.strip().unique()
+		options_selected = st.sidebar.multiselect('Select specific organizations:', ab_options_cat)
 
-	locations_selected = []
-	agg_option = st.sidebar.selectbox('Select an aggregation level:', agg_levels)
-	location_option = gvceh.get_locations(appendix_a, agg_option)
-	if location_option:
-		locations_selected = st.sidebar.multiselect('Select specific location(s):', location_option,
-													default=location_option)
 
-	# define variables based on user options
+	# filter dataframe based on user options
 	current_df, prior_df = gvceh.get_frames(start_date, end_date, use_df)
+	current_df, prior_df = gvceh.filter_by_search_options(current_df, prior_df, options_selected)
 	sentiments_by_category = gvceh.agg_sentiments_by_category(current_df, prior_df)
 	image = Image.open('./dashboard/branding.png')
 
@@ -125,104 +137,62 @@ with header:
 		kpi2.metric(label="Unique Users", value= f"{current_df['username'].nunique():,}")
 		kpi3.metric(label="Unique Locations", value= f"{current_df['search_neighbourhood'].nunique():,}")
 
+	if not current_df.empty:
+		# 1. Graph of tweets per day historically
+		st.subheader('Tweets Per Day')
+		tweets_per_day = current_df.groupby([current_df['created_at'].dt.date]).tweet_id.nunique()
 
-	# 1. Graph of tweets per day historically
-	st.subheader('Tweets Per Day')
-	tweets_per_day = current_df.groupby([current_df['created_at'].dt.date]).tweet_id.nunique()
-
-	st.download_button(
-		label="Download results as CSV",
-		data=tweets_per_day.to_csv().encode('utf-8'),
-		file_name='tweets_per_day.csv')
-
-	fig_0 = px.line(tweets_per_day, x=tweets_per_day.index, y="tweet_id",
-		labels={"tweet_id":"Number of Tweets", "created_at":"Date"})
-	fig_0.update_traces(line_color='#BF4C41')
-	st.plotly_chart(fig_0, use_container_width=True)
-
-
-	# whitespace
-	n = 0
-	while n < 4:
-		a1.write('')
-		n = n + 1
-
-	a3, a4 = st.columns(2)
-
-
-	# 2. Top Influencers
-	a3.subheader('Top Influencers')
-	current_influencers = gvceh.top_influencers(current_df)
-	if displaytweets_flag:
-		a3.table(current_df.loc[current_df['username'].isin(current_influencers.iloc[0:5]['username'])][
-					 ['username', 'text']].sample(n=5))
-
-	fig_3 = px.bar(current_influencers.iloc[0:5], x='username', y='score', 
-		labels={'username': 'Username', "score": 'Score'},
-		color_discrete_sequence=['#000080'])
-	a3.plotly_chart(fig_3)
-
-	# 3. Sentiment Scores Aggregated by Category, with prior period comparison
-	a4.subheader('Sentiment Scores')
-	if priorperiod_flag:
-		fig_1 = px.bar(sentiments_by_category, x='Sentiment', y=['Current', 'Prior'],
-						   barmode='group', color_discrete_sequence=['#000080', '#8c9e5e'] * 3)
-		a4.plotly_chart(fig_1)
-	else:
-		fig_2 = px.bar(sentiments_by_category, x='Sentiment', y='Current', color_discrete_sequence=['#000080'] * 3)
-		a4.plotly_chart(fig_2)
-
-
-	# 4. Geolocations
-	st.subheader('Locations')
-
-	if locations_selected:
-		locations_df = current_df[current_df["search_neighbourhood"].isin(locations_selected)]
-		if locations_df.empty:
-			st.write("No data for the selected location category.")
-			k_pivot = pd.DataFrame()
-		else:
-			k = locations_df[["search_neighbourhood", "sentiment"]]
-			k_pivot = k.pivot_table(index='search_neighbourhood',
-									   columns='sentiment',
-									   aggfunc=len,
-									   fill_value=0,
-								   	   margins = True,
-								       margins_name='Total')
-			st.dataframe(k_pivot)
-
-	elif agg_option == 'Capital Region District (All)':
-		k = current_df[["search_neighbourhood", "sentiment"]]
-		k_pivot = k.pivot_table(index='search_neighbourhood',
-									columns='sentiment',
-									aggfunc=len,
-									fill_value=0,
-								    margins = True,
-								    margins_name='Total')
-		st.dataframe(k_pivot) # add column name
-	else:
-		st.sidebar.error("No options selected. Please select at least one location.")
-
-
-	if not k_pivot.empty:
 		st.download_button(
-		label="Download results as CSV",
-		data=k_pivot.to_csv().encode('utf-8'),
-		file_name='geolocations.csv')
+			label="Download results as CSV",
+			data=tweets_per_day.to_csv().encode('utf-8'),
+			file_name='tweets_per_day.csv')
 
-	# 5. Viewing a random sample of tweets for sentiment categories
-	st.subheader('Sample of Tweets' if option == 'Twitter' else 'Sample of Posts')
-	choice = st.selectbox('Choose a sentiment', ['Negative', 'Neutral', 'Positive'])
-	if locations_selected:
-		if not k_pivot.empty:
-			# current_df = current_df.loc[current_df["search_neighbourhood"].isin(locations_selected)]
-			st.table((locations_df.loc[locations_df.sentiment == choice].sample(n=3))[['username', 'text', 'sentiment', 'search_keywords', 'search_neighbourhood']])
+		fig_0 = px.line(tweets_per_day, x=tweets_per_day.index, y="tweet_id",
+			labels={"tweet_id":"Number of Tweets", "created_at":"Date"})
+		fig_0.update_traces(line_color='#BF4C41')
+		st.plotly_chart(fig_0, use_container_width=True)
+
+
+		# whitespace
+		n = 0
+		while n < 4:
+			a1.write('')
+			n = n + 1
+
+		a3, a4 = st.columns(2)
+
+
+		# 2. Top Influencers
+		a3.subheader('Top Influencers')
+		current_influencers = gvceh.top_influencers(current_df)
+		if displaytweets_flag:
+			a3.table(current_df.loc[current_df['username'].isin(current_influencers.iloc[0:5]['username'])][
+						 ['username', 'text']].sample(n=5))
+
+		fig_3 = px.bar(current_influencers.iloc[0:5], x='username', y='score',
+			labels={'username': 'Username', "score": 'Score'},
+			color_discrete_sequence=['#000080'])
+		a3.plotly_chart(fig_3)
+
+		# 3. Sentiment Scores Aggregated by Category, with prior period comparison
+		a4.subheader('Sentiment Scores')
+		if priorperiod_flag:
+			fig_1 = px.bar(sentiments_by_category, x='Sentiment', y=['Current', 'Prior'],
+							   barmode='group', color_discrete_sequence=['#000080', '#8c9e5e'] * 3)
+			a4.plotly_chart(fig_1)
 		else:
-			st.write('No data for the selected location category. Displaying a sample of tweets from any location.')
-			st.table((current_df.loc[current_df.sentiment == choice].sample(n=3))[['username', 'text', 'sentiment', 'search_keywords', 'search_neighbourhood']])
+			fig_2 = px.bar(sentiments_by_category, x='Sentiment', y='Current', color_discrete_sequence=['#000080'] * 3)
+			a4.plotly_chart(fig_2)
 
+
+
+		# 5. Viewing a random sample of tweets for sentiment categories
+		st.subheader('Sample of Tweets' if option == 'Twitter' else 'Sample of Posts')
+		choice = st.selectbox('Choose a sentiment', ['Negative', 'Neutral', 'Positive'])
+		st.table((current_df.loc[current_df.sentiment == choice].sample(n=6))[['username', 'text', 'sentiment']])
 	else:
-		st.table((current_df.loc[current_df.sentiment == choice].sample(n=3))[['username', 'text', 'sentiment', 'search_keywords', 'search_neighbourhood']])
+		st.write('No tweets found for the selected categories.')
+
 
 ############################################################################################## EOF ##############################################################################################
 
