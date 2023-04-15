@@ -80,6 +80,7 @@ with sidebar:
 	flag1, flag2 = st.sidebar.columns(2)
 	influencer_flag = flag1.checkbox('Influencers', value=False)
 	organization_flag = flag2.checkbox('Organizations', value=False)
+	options_selected = []
 
 	if influencer_flag == False and organization_flag == False:
 		options_selected = []

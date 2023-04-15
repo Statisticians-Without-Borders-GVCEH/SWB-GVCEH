@@ -11,6 +11,7 @@ def sentiment_model(df):
     print("sentiment model downloaded")
 
     all_res = []
+
     for res in model(df.text.to_list(), batch_size=32, truncation=True):
         all_res.append(res)
 
