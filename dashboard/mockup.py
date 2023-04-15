@@ -82,7 +82,7 @@ with sidebar:
 	organization_flag = flag2.checkbox('Organizations', value=False)
 	options_selected = []
 
-	if influencer_flag == False and organization_flag == False:
+	if influencer_flag is False and organization_flag is False:
 		options_selected = []
 	elif influencer_flag and organization_flag:
 		appendix_ab_persons = pd.read_csv('./appendices/abpersons.csv')
@@ -97,7 +97,7 @@ with sidebar:
 		appendix_ab_persons = pd.read_csv('./appendices/abpersons.csv')
 		ab_options_cat = appendix_ab_persons["Influencers"].str.strip().unique()
 		options_selected = st.sidebar.multiselect('Select specific influencers:', ab_options_cat)
-	elif organization_flag:
+	else:
 		appendix_ab_orgs = pd.read_csv('./appendices/aborganizations.csv')
 		ab_options_cat = appendix_ab_orgs["Organizations"].str.strip().unique()
 		options_selected = st.sidebar.multiselect('Select specific organizations:', ab_options_cat)
