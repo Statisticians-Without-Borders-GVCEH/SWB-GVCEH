@@ -67,11 +67,15 @@ def update_file_in_github(USERNAME, TOKEN, git_file, df_new):
     else:
 
         # dedupe against old data; keep 1 copy of each row if duplicates exist then replace existing csv
-        df_merged = pd.concat([df_old, df_new]).drop_duplicates(subset='tweet_id', keep="last").reset_index(drop=True)
+        df_merged = pd.concat([df_old, df_new]).drop_duplicates(
+            subset='tweet_id',
+            keep="last").reset_index(drop=True)
         df_csv = df_merged.to_csv()
-
-        repo.update_file(path=last_file.path, message="Adding new tweets", sha=contents.sha, branch="main",
+        repo.update_file(path=last_file.path,
+                         message="Adding new tweets",
+                         sha=contents.sha,
+                         branch="main",
                          content=df_csv)
-        print(f"{last_file} updated in Github!")
 
+        print(f"{last_file} updated in Github!")
 
