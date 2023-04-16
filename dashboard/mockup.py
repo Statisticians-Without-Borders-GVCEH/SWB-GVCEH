@@ -102,8 +102,6 @@ with sidebar:
 		ab_options_cat = appendix_ab_orgs["Organizations"].str.strip().unique()
 		options_selected = st.sidebar.multiselect('Select specific organizations:', ab_options_cat)
 
-	st.sidebar.write(options_selected)
-
 	# filter dataframe based on user options
 	current_df, prior_df = gvceh.get_frames(start_date, end_date, use_df)
 	current_df, prior_df = gvceh.filter_by_search_options(current_df, prior_df, options_selected)
