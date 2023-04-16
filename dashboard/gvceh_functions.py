@@ -122,7 +122,7 @@ def filter_by_search_options(df1, df2, options_selected):
     else:
         df1 = df1[df1["username"].isin(options_selected)]
         df2 = df2[df2["username"].isin(options_selected)]
-        return (df1, df2)
+        return df1, df2
 
 def top_influencers(cdf):
 
