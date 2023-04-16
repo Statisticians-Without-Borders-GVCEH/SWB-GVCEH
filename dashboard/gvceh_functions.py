@@ -117,7 +117,7 @@ def agg_sentiments_by_category(cdf, pdf):
 
 # test: 02_test_sentiment_agg
 def filter_by_search_options(df1, df2, options_selected):
-    if options_selected == []:
+    if not options_selected:
         return df1, df2
     else:
         df1 = df1[df1["username"].isin(options_selected)]
